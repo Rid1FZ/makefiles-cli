@@ -1,8 +1,8 @@
 [project]
 name = "makefiles"
-version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.13"
+version = "0.0.1"
+description = "Create files from templates inside xdg-template-dir"
+requires-python = ">=3.12"
 dependencies = []
 
 [tool.black]
