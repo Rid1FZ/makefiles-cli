@@ -5,6 +5,13 @@ class MKFileException(Exception):
         Exception.__init__(self, *args)
 
 
+class PathNotFoundError(MKFileException):
+    """Path does not exists"""
+
+    def __init__(self, *args) -> None:
+        MKFileException.__init__(self, *args)
+
+
 class TemplateCreationError(MKFileException):
     """Failed to create template"""
 
@@ -13,35 +20,35 @@ class TemplateCreationError(MKFileException):
 
 
 class TemplateNotFoundError(TemplateCreationError):
-    """Given template not found"""
+    """Template not found"""
 
     def __init__(self, *args) -> None:
         TemplateCreationError.__init__(self, *args)
 
 
 class CopyError(MKFileException):
-    """Failed to copy given file"""
+    """Failed to copy file"""
 
     def __init__(self, *args) -> None:
         MKFileException.__init__(self, *args)
 
 
 class InvalidSourceError(CopyError):
-    """Given source is invalid"""
+    """Copy source is invalid"""
 
     def __init__(self, *args) -> None:
         CopyError.__init__(self, *args)
 
 
 class SourceNotFoundError(CopyError, FileNotFoundError):
-    """Given source does not exists"""
+    """Copy source does not exists"""
 
     def __init__(self, *args) -> None:
         FileNotFoundError.__init__(self, *args)
 
 
 class DestinationExistsError(CopyError, FileExistsError):
-    """Given destination already exists"""
+    """Copy destination already exists"""
 
     def __init__(self, *args) -> None:
         FileExistsError.__init__(self, *args)
