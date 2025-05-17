@@ -11,3 +11,6 @@ wheels/
 
 # Editor generated files
 .repoproject/
+
+# Temporary files
+tempdir/
