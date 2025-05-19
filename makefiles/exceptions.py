@@ -5,6 +5,13 @@ class MKFileException(Exception):
         Exception.__init__(self, *args)
 
 
+class InvalidPathError(MKFileException):
+    """Path is invalid"""
+
+    def __init__(self, *args) -> None:
+        MKFileException.__init__(self, *args)
+
+
 class PathNotFoundError(MKFileException):
     """Path does not exists"""
 
@@ -33,7 +40,7 @@ class CopyError(MKFileException):
         MKFileException.__init__(self, *args)
 
 
-class InvalidSourceError(CopyError):
+class InvalidSourceError(CopyError, InvalidPathError):
     """Copy source is invalid"""
 
     def __init__(self, *args) -> None:
@@ -52,3 +59,17 @@ class DestinationExistsError(CopyError, FileExistsError):
 
     def __init__(self, *args) -> None:
         FileExistsError.__init__(self, *args)
+
+
+class FZFError(MKFileException):
+    """Failed to run fzf"""
+
+    def __init__(self, *args) -> None:
+        MKFileException.__init__(self, *args)
+
+
+class FZFNotFoundError(FZFError):
+    """fzf executable not found"""
+
+    def __init__(self, *args) -> None:
+        FZFError.__init__(self, *args)
