@@ -41,6 +41,6 @@ def create_symlink(path: pathlib.Path, target: pathlib.Path) -> None:
     path.symlink_to(target, target_is_directory=False)
 
 
-def get_random_str(length: int = 32) -> str:
+def get_random_str(length: int = 32, *, special_chars: bool = True) -> str:
     """Return a string of random printable charecters of given length"""
-    return "".join(random.choice(string.printable) for _ in range(length))
+    return "".join(random.choices(string.printable if special_chars else string.ascii_letters, k=length))
