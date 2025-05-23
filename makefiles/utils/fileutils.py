@@ -1,4 +1,3 @@
-import os
 import pathlib
 import shutil
 
@@ -37,3 +36,4 @@ def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> No
             dest.unlink(missing_ok=False)
 
         shutil.copyfile(src, dest, follow_symlinks=True)
+
