@@ -1,3 +1,6 @@
+import makefiles.types as custom_types
+
+
 def prompt(options: list[str]) -> str:
     """
     Create a simple prompt using `print` and `input` function to select
@@ -13,13 +16,12 @@ def prompt(options: list[str]) -> str:
     for index, option in enumerate(options, start=1):
         print(f"[{index}]: {option}")
 
-    choice: int = -1
     while True:
         try:
-            choice = int(input("Choose a template: "))
-            assert 0 < choice <= len(options)
+            choice: custom_types.NaturalNumber = custom_types.NaturalNumber(input("Choose a template: "))
+            assert choice <= len(options)
             break
-        except (ValueError, AssertionError):
+        except (ValueError, TypeError, AssertionError):
             print("Please insert a valid input")
 
     return options[choice - 1]

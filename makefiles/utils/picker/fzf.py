@@ -2,6 +2,7 @@ import shutil
 import subprocess
 
 import makefiles.exceptions as exceptions
+import makefiles.types as custom_types
 
 FZF_DEFAULT_FLAGS: list[str] = [
     "--style=minimal",
@@ -10,7 +11,7 @@ FZF_DEFAULT_FLAGS: list[str] = [
 ]
 
 
-def prompt(options: list[str], *, height: int = 10) -> str:
+def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_types.NaturalNumber(10)) -> str:
     """
     Create a prompt using `fzf` commandline tool to choose from bunch of options.
     This function needs the `fzf` to be installed in the system and binary
@@ -19,7 +20,7 @@ def prompt(options: list[str], *, height: int = 10) -> str:
     Parameters:
         options(list[str]): list of options to prompt user to choose from.
             Must be a list of strings.
-        height(int): height of `fzf` prompt. Default is 10. Can be negative integer.
+        height(makefiles.types.NaturalNumber): height of `fzf` prompt. Default is 10. Can be negative integer.
 
     Raises:
         makefiles.exceptions.FZFNotFoundError: if `fzf` not found in `PATH`.
