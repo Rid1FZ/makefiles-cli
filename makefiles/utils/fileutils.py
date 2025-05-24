@@ -37,3 +37,29 @@ def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> No
 
         shutil.copyfile(src, dest, follow_symlinks=True)
 
+
+def create_empty_files(*paths: pathlib.Path, overwrite: bool = False) -> None:
+    """
+    Create empty files in the given paths.
+
+    Parameters:
+        *paths(pathlib.Path): paths to files.
+        overwrite(bool): if `True`, overwrite file if already exists
+
+    Raises:
+        makefiles.exceptions.DestinationExistsError: if given path already exists.
+    """
+
+    for path in paths:
+        if utils.exists(path) and not overwrite:
+            raise exceptions.DestinationExistsError(f"file {path} already exists")
+
+        try:
+            if utils.isfile(path) or utils.islink(path) or utils.isbrokenlink(path):
+                path.unlink(missing_ok=True)
+            elif utils.isdir(path):
+                shutil.rmtree(path)
+        except FileNotFoundError:
+            pass
+
+        path.touch(exist_ok=False)
