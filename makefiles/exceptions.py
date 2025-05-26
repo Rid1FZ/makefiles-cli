@@ -26,11 +26,18 @@ class TemplateCreationError(MKFileException):
         MKFileException.__init__(self, *args)
 
 
-class TemplateNotFoundError(TemplateCreationError):
-    """Template not found"""
+class NoTemplatesAvailableError(MKFileException, FileNotFoundError):
+    """No template found"""
 
     def __init__(self, *args) -> None:
-        TemplateCreationError.__init__(self, *args)
+        FileNotFoundError.__init__(self, *args)
+
+
+class TemplateNotFoundError(MKFileException, FileNotFoundError):
+    """Given template not found"""
+
+    def __init__(self, *args) -> None:
+        FileNotFoundError.__init__(self, *args)
 
 
 class CopyError(MKFileException):
