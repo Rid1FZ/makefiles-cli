@@ -1,4 +1,5 @@
 import makefiles.types as custom_types
+import makefiles.utils.cli_io as cli_io
 
 
 def prompt(options: list[str]) -> str:
@@ -14,14 +15,15 @@ def prompt(options: list[str]) -> str:
     options = sorted(options)  # do not modify the parameter
 
     for index, option in enumerate(options, start=1):
-        print(f"[{index}]: {option}")
+        cli_io.print(f"[{index}]: {option}\n")
 
     while True:
         try:
-            choice: custom_types.NaturalNumber = custom_types.NaturalNumber(input("Choose a template: "))
+            cli_io.print("Choose a template: ")
+            choice: custom_types.NaturalNumber = custom_types.NaturalNumber(cli_io.input())
             assert choice <= len(options)
             break
         except (ValueError, TypeError, AssertionError):
-            print("Please insert a valid input")
+            cli_io.eprint("Please insert a valid input\n")
 
     return options[choice - 1]
