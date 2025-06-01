@@ -1,9 +1,34 @@
 [project]
-name = "makefiles"
-version = "0.0.1"
-description = "Create files from templates inside xdg-template-dir"
-requires-python = ">=3.12"
+name = "makefiles-cli"
+dynamic = ["version"]
+description = "A lightweight Python utility for file creation and template generation from XDG_TEMPLATES_DIR"
+requires-python = ">=3.10"
 dependencies = []
+
+[build-system]
+requires = ["setuptools>=42", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 120
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+version_file = "makefiles/_version.py"
+
+[tool.setuptools]
+script-files = ["mkfile"]
+packages = [
+    "makefiles",
+    "makefiles.utils",
+    "makefiles.utils.picker"
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "pyright>=1.1.401",
+    "pytest>=8.3.5",
+]
