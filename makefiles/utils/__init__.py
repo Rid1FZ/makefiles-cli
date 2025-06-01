@@ -39,9 +39,9 @@ def isbrokenlink(path: pathlib.Path) -> bool:
 
 
 def get_version() -> str:
-    from importlib.metadata import PackageNotFoundError, version
-
     try:
-        return version("your-package-name")
-    except PackageNotFoundError:
+        import makefiles._version as v
+
+        return v.version
+    except ImportError:
         return "unknown"
