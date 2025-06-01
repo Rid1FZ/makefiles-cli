@@ -17,7 +17,7 @@ def listf(path: pathlib.Path) -> list[str]:
     """
     path = path.absolute()
     if not (utils.isdir(path) or utils.islinkd(path)):
-        raise exceptions.InvalidPathError("Given path is not a directory or link to directory")
+        raise exceptions.InvalidPathError("given path is not a directory or link to directory")
 
     result: list[str] = []
 
