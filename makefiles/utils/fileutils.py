@@ -1,6 +1,7 @@
 import pathlib
 import shutil
 
+import makefiles.exceptions as exceptions
 import makefiles.types as custom_types
 import makefiles.utils as utils
 import makefiles.utils.cli_io as cli_io
@@ -11,31 +12,29 @@ def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> cu
     Copies a source file or symbolic link to one or more destination paths.
 
     Args:
-        src (pathlib.Path): The source file path to copy from. Must be a regular file or a symlink to a file.
-        *dests (pathlib.Path): One or more destination paths to copy the file to.
-        overwrite (bool, optional): If False, the function will not overwrite existing destination files.
-                                    If True, it will overwrite them. Defaults to False.
+        src (pathlib.Path): Path to the source file. Must be a regular file or a symlink to a file.
+        *dests (pathlib.Path): One or more destination paths to copy the source to.
+        overwrite (bool, optional): If True, existing destination files will be overwritten.
+                                    If False (default), existing files will trigger an error and be skipped.
 
     Returns:
-        makefiles.types.ExitCode: Exit code 0 on full success. Returns 1 if any error occurs such as:
-            - Source does not exist.
-            - Source is not a file or valid symlink.
-            - Destination exists and overwrite is False.
+        custom_types.ExitCode: Exit code 0 if all copies succeed.
+                               Returns 1 if any destination exists and overwrite is False.
+
+    Raises:
+        makefiles.exceptions.SourceNotFoundError: If the source path does not exist.
+        makefiles.exceptions.InvalidSourceError: If the source is not a file or a symbolic link to a file.
     """
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
 
     if not utils.exists(src):
-        cli_io.eprint(f"source {str(src)} does not exists")
-        exitcode = custom_types.ExitCode(1) or exitcode
-        return exitcode
+        raise exceptions.SourceNotFoundError(f"source {str(src)} does not exists")
     elif not (utils.isfile(src) or utils.islinkf(src)):
-        cli_io.eprint(f"source {str(src)} is not a file or a link to file")
-        exitcode = custom_types.ExitCode(1) or exitcode
-        return exitcode
+        raise exceptions.InvalidSourceError(f"source {str(src)} is not a file or a link to file")
 
     for dest in dests:
         if utils.exists(dest) and not overwrite:
-            cli_io.eprint(f"destination {str(dest)} already exists")
+            cli_io.eprint(f"destination {str(dest)} already exists\n")
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
@@ -66,7 +65,7 @@ def create_empty_files(*paths: pathlib.Path, overwrite: bool = False) -> custom_
 
     for path in paths:
         if utils.exists(path) and not overwrite:
-            cli_io.eprint(f"file {path} already exists")
+            cli_io.eprint(f"destination {path} already exists\n")
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 

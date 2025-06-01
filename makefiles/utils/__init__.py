@@ -36,3 +36,12 @@ def isbrokenlink(path: pathlib.Path) -> bool:
     """Checks if given path is a broken symlink"""
     # if path is a broken link, pathlib.Path.exists will return False. We will use this feature
     return path.is_symlink() and not path.exists()
+
+
+def get_version() -> str:
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("your-package-name")
+    except PackageNotFoundError:
+        return "unknown"

@@ -7,13 +7,17 @@ import makefiles.utils as utils
 
 def listf(path: pathlib.Path) -> list[str]:
     """
-    List all the files recursively inside given directory and it's subdirectories.
+    Recursively lists all non-hidden files within a directory, relative to the given path.
 
-    Parameters:
-        path(pathlib.Path): path to directory.
+    Args:
+        path (pathlib.Path): Path to a directory or a symbolic link to a directory.
+
+    Returns:
+        list[str]: A list of relative file paths (as strings) for all non-hidden files
+                   within the directory tree rooted at `path`.
 
     Raises:
-        exceptions.InvalidPathError: if `path` is not a directory or link to directory.
+        makefiles.exceptions.InvalidPathError: If the provided path is not a directory or a symlink to a directory.
     """
     path = path.absolute()
     if not (utils.isdir(path) or utils.islinkd(path)):

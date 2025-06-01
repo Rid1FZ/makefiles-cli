@@ -4,13 +4,13 @@ import makefiles.utils.cli_io as cli_io
 
 def prompt(options: list[str]) -> str:
     """
-    Create a simple prompt using `print` and `input` function to select
-    from a bunch of options. The only way to exit out of this prompt is
-    to trigger the `KeyboardInterrupt` exception using Ctrl-c.
+    Displays a numbered list of options and prompts the user to select one via keyboard input.
 
-    Parameters:
-        options(list[str]): list of options to choose from. Must be a list of
-            strings.
+    Args:
+        options (list[str]): A list of string options to present to the user for selection.
+
+    Returns:
+        str: The selected option from the list, based on user input.
     """
     options = sorted(options)  # do not modify the parameter
 

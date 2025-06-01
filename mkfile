@@ -2,7 +2,7 @@
 
 import sys
 
-import makefiles
+from makefiles.main import main
 
 if __name__ == "__main__":
-    sys.exit(makefiles.main())
+    sys.exit(main())

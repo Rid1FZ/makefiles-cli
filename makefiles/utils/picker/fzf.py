@@ -13,18 +13,20 @@ FZF_DEFAULT_FLAGS: list[str] = [
 
 def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_types.NaturalNumber(10)) -> str:
     """
-    Create a prompt using `fzf` commandline tool to choose from bunch of options.
-    This function needs the `fzf` to be installed in the system and binary
-    to be available in the `PATH`.
+    Displays an interactive fuzzy-selection prompt using `fzf` and returns the user's selection.
 
-    Parameters:
-        options(list[str]): list of options to prompt user to choose from.
-            Must be a list of strings.
-        height(makefiles.types.NaturalNumber): height of `fzf` prompt. Default is 10. Can be negative integer.
+    Args:
+        options (list[str]): A list of string options to display in the selection interface.
+        height (custom_types.NaturalNumber, optional): Approximate terminal height percentage for the `fzf` UI.
+            Defaults to 10. The value is interpreted as `--height=~<value>` by `fzf`.
+
+    Returns:
+        str: The selected option as returned by `fzf`, with trailing newline removed.
 
     Raises:
-        makefiles.exceptions.FZFNotFoundError: if `fzf` not found in `PATH`.
-        makefiles.exceptions.FZFError: if `fzf` command returns non-zero returncode.
+        exceptions.FZFNotFoundError: If the `fzf` binary is not found in the system PATH.
+        KeyboardInterrupt: If the user interrupts the prompt using Ctrl+C (fzf returns exit code 130).
+        exceptions.FZFError: If `fzf` exits with a non-zero return code other than 130.
     """
     if not shutil.which("fzf"):
         raise exceptions.FZFNotFoundError("`fzf` is not found in path")
@@ -39,6 +41,8 @@ def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_ty
     )
 
     if process.returncode != 0:
+        if process.returncode == 130:
+            raise KeyboardInterrupt
         raise exceptions.FZFError("`fzf` command returned non zero exit code")
 
     return process.stdout.strip("\n")

@@ -3,6 +3,7 @@ import random
 
 import pytest
 
+import makefiles.exceptions as exceptions
 import tests.utils as utils
 from makefiles.types import ExitCode
 from makefiles.utils.fileutils import copy
@@ -46,7 +47,8 @@ class TestCopy(utils.TestMKFile):
         filepath: pathlib.Path = self.tempdir.joinpath("file")
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
 
-        assert copy(filepath, copypath) == ExitCode(1)
+        with pytest.raises(exceptions.SourceNotFoundError):
+            copy(filepath, copypath)
 
     def test_non_file(self) -> None:
         dirpath: pathlib.Path = self.tempdir.joinpath("directory")
@@ -54,7 +56,8 @@ class TestCopy(utils.TestMKFile):
 
         dirpath.mkdir(parents=True, exist_ok=False)
 
-        assert copy(dirpath, copypath) == ExitCode(1)
+        with pytest.raises(exceptions.InvalidSourceError):
+            copy(dirpath, copypath)
 
     def test_existing_file(self, filepath: pathlib.Path) -> None:
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
