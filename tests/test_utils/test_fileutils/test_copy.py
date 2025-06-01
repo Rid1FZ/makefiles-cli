@@ -3,8 +3,8 @@ import random
 
 import pytest
 
-import makefiles.exceptions as exceptions
 import tests.utils as utils
+from makefiles.types import ExitCode
 from makefiles.utils.fileutils import copy
 
 
@@ -18,7 +18,7 @@ class TestCopy(utils.TestMKFile):
     def test_one_regular_file(self, filepath: pathlib.Path) -> None:
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
 
-        copy(filepath, copypath)
+        assert copy(filepath, copypath) == ExitCode(0)
 
         assert utils.compare_files(filepath, copypath)
 
@@ -28,7 +28,7 @@ class TestCopy(utils.TestMKFile):
         ]
 
         for cpath in copypaths:
-            copy(filepath, cpath)
+            assert copy(filepath, cpath) == ExitCode(0)
 
         assert all(utils.compare_files(filepath, cpath) for cpath in copypaths)
 
@@ -38,7 +38,7 @@ class TestCopy(utils.TestMKFile):
 
         utils.create_symlink(linkpath, filepath)
 
-        copy(linkpath, copypath)
+        assert copy(linkpath, copypath) == ExitCode(0)
 
         assert utils.compare_files(filepath, copypath)
 
@@ -46,8 +46,7 @@ class TestCopy(utils.TestMKFile):
         filepath: pathlib.Path = self.tempdir.joinpath("file")
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
 
-        with pytest.raises(exceptions.SourceNotFoundError):
-            copy(filepath, copypath)
+        assert copy(filepath, copypath) == ExitCode(1)
 
     def test_non_file(self) -> None:
         dirpath: pathlib.Path = self.tempdir.joinpath("directory")
@@ -55,13 +54,11 @@ class TestCopy(utils.TestMKFile):
 
         dirpath.mkdir(parents=True, exist_ok=False)
 
-        with pytest.raises(exceptions.InvalidSourceError):
-            copy(dirpath, copypath)
+        assert copy(dirpath, copypath) == ExitCode(1)
 
     def test_existing_file(self, filepath: pathlib.Path) -> None:
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
 
         utils.create_file(copypath)
 
-        with pytest.raises(exceptions.DestinationExistsError):
-            copy(filepath, copypath)
+        assert copy(filepath, copypath) == ExitCode(1)
