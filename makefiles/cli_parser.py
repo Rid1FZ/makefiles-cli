@@ -11,7 +11,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "files",
-        nargs="+",
+        nargs="*",
         action="store",
         help="paths to files to create",
     )
@@ -46,6 +46,12 @@ def get_parser() -> argparse.ArgumentParser:
         type=custom_types.NaturalNumber,
         default=[custom_types.NaturalNumber(10)],
         help="height of fzf window if fzf is used as template picker.",
+    )
+
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="print version and exit",
     )
 
     return parser

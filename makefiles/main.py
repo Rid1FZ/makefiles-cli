@@ -83,6 +83,14 @@ def main() -> custom_types.ExitCode:
     argument_parser: argparse.ArgumentParser = cli_parser.get_parser()
     cli_arguments: argparse.Namespace = argument_parser.parse_args()
 
+    if not cli_arguments.files and not cli_arguments.version:
+        argument_parser.error("the following arguments are required: files")
+
+    if cli_arguments.version:
+        cli_io.print(f"{utils.get_version()}\n")
+        exitcode = custom_types.ExitCode(1)
+        return exitcode
+
     try:
         exitcode = runner(cli_arguments) or exitcode
     except exceptions.MKFileException as ex:
