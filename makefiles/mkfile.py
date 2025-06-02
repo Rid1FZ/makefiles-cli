@@ -14,6 +14,8 @@ import makefiles.utils.picker as picker
 
 TEMPLATES_DIR: str = os.environ.get("XDG_TEMPLATES_DIR", f"{os.environ["HOME"]}/Templates")
 
+templates_dir_path: pathlib.Path = pathlib.Path(TEMPLATES_DIR)
+
 
 def _create_template(template: str, *destinations: pathlib.Path, templates_dir: pathlib.Path) -> custom_types.ExitCode:
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
@@ -50,9 +52,8 @@ def _get_template_from_prompt(
 
 
 def runner(cli_arguments: argparse.Namespace) -> custom_types.ExitCode:
+    global templates_dir_path
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
-
-    templates_dir_path: pathlib.Path = pathlib.Path(TEMPLATES_DIR)
 
     files: list[str] = cli_arguments.files
     template: str | object | None = cli_arguments.template
@@ -78,17 +79,22 @@ def runner(cli_arguments: argparse.Namespace) -> custom_types.ExitCode:
 
 
 def main() -> custom_types.ExitCode:
+    global templates_dir_path
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
 
     argument_parser: argparse.ArgumentParser = cli_parser.get_parser()
     cli_arguments: argparse.Namespace = argument_parser.parse_args()
 
-    if not cli_arguments.files and not cli_arguments.version:
+    if not cli_arguments.files and not (cli_arguments.version or cli_arguments.list):
         argument_parser.error("the following arguments are required: files")
 
     if cli_arguments.version:
         cli_io.print(f"{utils.get_version()}\n")
         exitcode = custom_types.ExitCode(1)
+        return exitcode
+
+    if cli_arguments.list:
+        cli_io.print(f"{"\n".join(dirwalker.listf(templates_dir_path))}\n")
         return exitcode
 
     try:

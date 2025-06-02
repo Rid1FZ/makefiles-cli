@@ -17,6 +17,12 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "--version",
+        action="store_true",
+        help="print version and exit",
+    )
+
+    parser.add_argument(
         "-t",
         "--template",
         nargs="?",
@@ -49,9 +55,10 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--version",
+        "-l",
+        "--list",
         action="store_true",
-        help="print version and exit",
+        help="list available templates and exit",
     )
 
     return parser
