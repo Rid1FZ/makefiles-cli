@@ -2,12 +2,35 @@
 name = "makefiles-cli"
 dynamic = ["version"]
 description = "A lightweight Python utility for file creation and template generation from XDG_TEMPLATES_DIR"
-requires-python = ">=3.10"
+readme = "README.md"
+license = "GPL-3.0-only"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: Console",
+    "Typing :: Typed",
+]
+keywords = ["makefiles", "mkfiles", "mkfile", "makefiles-cli", "mkfile-cli"]
 dependencies = []
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/Rid1FZ/makefiles-cli"
 
 [build-system]
 requires = ["setuptools>=42", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "pyright>=1.1.401",
+    "pytest>=8.3.5",
+]
 
 [tool.black]
 line-length = 120
@@ -23,12 +46,4 @@ packages = [
     "makefiles",
     "makefiles.utils",
     "makefiles.utils.picker"
-]
-
-[dependency-groups]
-dev = [
-    "black>=25.1.0",
-    "isort>=6.0.1",
-    "pyright>=1.1.401",
-    "pytest>=8.3.5",
 ]
