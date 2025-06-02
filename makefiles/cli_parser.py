@@ -1,6 +1,8 @@
 import argparse
 
 import makefiles.types as custom_types
+import makefiles.utils as utils
+import makefiles.utils.cli_io as cli_io
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -62,3 +64,12 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     return parser
+
+
+def get_cli_args(argparser: argparse.ArgumentParser) -> argparse.Namespace:
+    cli_arguments: argparse.Namespace = argparser.parse_args()
+
+    if not cli_arguments.files and not (cli_arguments.version or cli_arguments.list):
+        argparser.error("the following arguments are required: files")
+
+    return cli_arguments
