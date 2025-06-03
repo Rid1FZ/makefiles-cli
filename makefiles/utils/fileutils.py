@@ -70,7 +70,7 @@ def copy(
             continue
 
         _clear_hinder(dest)
-        dest_parent.mkdir(parents=True, exist_ok=False)
+        dest_parent.mkdir(parents=True, exist_ok=True)
 
         shutil.copyfile(src, dest, follow_symlinks=True)
 
