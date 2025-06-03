@@ -15,7 +15,6 @@ class TestCreateEmptyFile(utils.TestMKFile):
         filepath: pathlib.Path = self.tempdir.joinpath("file")
 
         assert create_empty_files(filepath) == ExitCode(0)
-
         assert _is_file(filepath)
 
     def test_multiple_files(self) -> None:
@@ -24,7 +23,6 @@ class TestCreateEmptyFile(utils.TestMKFile):
         ]
 
         assert create_empty_files(*filepaths) == ExitCode(0)
-
         assert all(_is_file(filepath) for filepath in filepaths)
 
     def test_existing_file(self) -> None:
@@ -33,3 +31,10 @@ class TestCreateEmptyFile(utils.TestMKFile):
         utils.create_file(filepath)
 
         assert create_empty_files(filepath) == ExitCode(1)
+
+    def test_non_existing_body(self) -> None:
+        filepath: pathlib.Path = self.tempdir.joinpath("random/body/copy")
+
+        assert create_empty_files(filepath, parents=False) == ExitCode(1)
+        assert create_empty_files(filepath, parents=True) == ExitCode(0)
+        assert _is_file(filepath)
