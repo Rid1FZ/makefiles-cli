@@ -19,15 +19,14 @@ compare_files: functools.partial = functools.partial(filecmp.cmp, shallow=False)
 
 def _ensure_natural_number(num: int, name: str) -> None:
     """
-    Ensure that given number is a natural number greater than 0.
+    Validates that a given number is a natural number (positive integer).
 
-    Parameters:
-        num(int): number to check.
-        name(int): name of the variable. Used for error message.
+    Args:
+        num (int): The number to validate.
+        name (str): The name of the variable being validated, used in the error message.
 
     Raises:
-        ValueError: if given number is not an integer or is not greater
-            than 0.
+        ValueError: If the number is not an integer greater than 0.
     """
     if not (isinstance(num, int) and num > 0):
         raise ValueError(f"{name} must be an integer greater then 0")
@@ -35,12 +34,16 @@ def _ensure_natural_number(num: int, name: str) -> None:
 
 def create_file(path: pathlib.Path, *, empty: bool = False) -> None:
     """
-    Create a file.
+    Creates a file at the specified path, optionally with random content.
 
-    Parameters:
-        path(pathlib.Path): path to file.
-        empty(bool): if `True`, create and empty file with no content.
-            Default is `False`
+    Args:
+        path (pathlib.Path): The full path where the file will be created.
+        empty (bool, optional): If True, creates an empty file. If False (default),
+            writes random content to the file.
+
+    Raises:
+        FileExistsError: If `empty` is True and the file already exists.
+        OSError: For any underlying OS-related issues during directory or file creation.
     """
     path = path.absolute()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -61,21 +64,20 @@ def generate_tree(
     hidden: bool = False,
 ) -> list[str]:
     """
-    Generate a filetree with random files and random subdirectories.
+    Generates a random directory tree with files and subdirectories.
 
-    Parameters:
-        root_dir(pathlib.Path): root directory in which tree will be generated.
-        max_depth(int): maximum depth of tree. Default is 3.
-        max_children(int): maximum children per directory. Default is 3.
-        max_files(int): maximum files per directory.
-        hidden(bool): if `True`, randomly add hidden files and directories.
+    Args:
+        root_dir (pathlib.Path): The root directory where the tree will be generated.
+        max_depth (int, optional): Maximum depth of the directory tree. Must be > 0. Default is 3.
+        max_children (int, optional): Maximum number of subdirectories per directory. Must be > 0. Default is 5.
+        max_files (int, optional): Maximum number of files per directory. Must be > 0. Default is 3.
+        hidden (bool, optional): If True, some files and directories will be hidden (prefixed with '.'). Default is False.
 
-    Returns(list[str]):
-        A list of all the files created relative to `root_dir`.
+    Returns:
+        list[str]: A list of all file paths created, relative to `root_dir`.
 
     Raises:
-        ValueError: if any of `max_depth`, `max_children`, `max_files` is not an
-            instance of `int` class or not is greater than 0.
+        ValueError: If `max_depth`, `max_children`, or `max_files` is not a positive integer.
     """
     _ensure_natural_number(max_depth, name="max_depth")
     _ensure_natural_number(max_children, name="max_children")
@@ -115,12 +117,15 @@ def generate_tree(
 
 def create_symlink(path: pathlib.Path, target: pathlib.Path) -> None:
     """
-    Create a symlink.
+    Creates a symbolic link at the specified path pointing to the target.
 
-    Parameters:
-        path(pathlib.Path): path, where to create symlink.
-        target(pathlib.Path): path to the file/directory the symlink will
-            point to.
+    Args:
+        path (pathlib.Path): The location where the symlink will be created.
+        target (pathlib.Path): The file or directory the symlink will point to.
+
+    Raises:
+        FileExistsError: If the symlink already exists.
+        OSError: For other OS-level errors such as permission issues.
     """
     path = path.absolute()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -129,17 +134,18 @@ def create_symlink(path: pathlib.Path, target: pathlib.Path) -> None:
 
 def get_random_str(length: int = 32, *, special_chars: bool = True) -> str:
     """
-    Return a string of random charecters.
+    Generates a random string of the specified length.
 
-    Parameters:
-        length(int): length of string.
-        special_chars(bool): if `True`, use special chars alongside ascii_Letters.
+    Args:
+        length (int): The desired length of the string. Must be greater than 0.
+        special_chars (bool, optional): If True, includes special characters from `string.printable`.
+            If False, uses only ASCII letters. Default is True.
 
-    Returns(str):
-        A random string of given length from `string.printable` or `string.ascii_letters`.
+    Returns:
+        str: A random string composed of either `string.printable` or `string.ascii_letters`.
 
     Raises:
-        ValueError: if `length` is not an integer or not greater than 0.
+        ValueError: If `length` is not a positive integer.
     """
     _ensure_natural_number(length, name="length")
 
@@ -147,4 +153,14 @@ def get_random_str(length: int = 32, *, special_chars: bool = True) -> str:
 
 
 def get_random_name() -> str:
+    """
+    Generates a random name-like string consisting of ASCII letters.
+
+    Returns:
+        str: A random string of 16 to 64 ASCII letters, with no special characters.
+
+    Note:
+        This function is a convenience wrapper around `get_random_str` with
+        a randomized length and `special_chars=False`.
+    """
     return get_random_str(random.randint(16, 64), special_chars=False)
