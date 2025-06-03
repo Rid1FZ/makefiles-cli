@@ -102,7 +102,7 @@ def main() -> custom_types.ExitCode:
     except exceptions.MKFileException as ex:
         cli_io.eprint(f"{argument_parser.prog}: {str(ex)}\n")
         exitcode = custom_types.ExitCode(1)
-    except KeyboardInterrupt as ex:
+    except KeyboardInterrupt:
         exitcode = custom_types.ExitCode(130)
-    finally:
-        return exitcode
+
+    return exitcode

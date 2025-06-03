@@ -7,7 +7,27 @@ import makefiles.utils as utils
 import makefiles.utils.cli_io as cli_io
 
 
-def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> custom_types.ExitCode:
+def _clear_hinder(path: pathlib.Path) -> None:
+    """
+    Remove/unlink any hinder which may cause creation of `path` to be failed.
+    """
+    hinder: str | None = utils.get_hinder(path)
+    if not hinder:
+        return
+
+    hinder_path: pathlib.Path = pathlib.Path(hinder)
+    try:
+        if utils.isfile(hinder_path) or utils.islink(hinder_path) or utils.isbrokenlink(hinder_path):
+            hinder_path.unlink(missing_ok=True)
+        elif utils.isdir(hinder_path):
+            shutil.rmtree(hinder_path)
+    except FileNotFoundError:
+        pass
+
+
+def copy(
+    src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False, parents: bool = False
+) -> custom_types.ExitCode:
     """
     Copies a source file or symbolic link to one or more destination paths.
 
@@ -15,7 +35,9 @@ def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> cu
         src (pathlib.Path): Path to the source file. Must be a regular file or a symlink to a file.
         *dests (pathlib.Path): One or more destination paths to copy the source to.
         overwrite (bool, optional): If True, existing destination files will be overwritten.
-                                    If False (default), existing files will trigger an error and be skipped.
+                                    If False (default), print an error message and be skip.
+        parents (bool, optional): If True, create parent(s) if not already exists.
+                                  If False (default), print an error message and skip.
 
     Returns:
         custom_types.ExitCode: Exit code 0 if all copies succeed.
@@ -38,24 +60,29 @@ def copy(src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False) -> cu
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
-        # shutil.copyfile is unable to overwrite any broken symlink. So we will do it manually
-        if utils.isbrokenlink(dest):
-            dest.unlink(missing_ok=False)
+        dest_parent: pathlib.Path = dest.parent
+        if not (utils.isdir(dest_parent) or utils.islinkd(dest_parent)) and not parents:
+            cli_io.eprint(f"parent dir {str(dest_parent)} does not exists")
+            exitcode = custom_types.ExitCode(1) or exitcode
+            continue
+
+        _clear_hinder(dest)
 
         shutil.copyfile(src, dest, follow_symlinks=True)
 
     return exitcode
 
 
-def create_empty_files(*paths: pathlib.Path, overwrite: bool = False) -> custom_types.ExitCode:
+def create_empty_files(*paths: pathlib.Path, overwrite: bool = False, parents: bool = False) -> custom_types.ExitCode:
     """
     Creates empty files at the specified paths, optionally overwriting existing files or directories.
 
     Args:
         *paths (pathlib.Path): One or more paths where empty files should be created.
-        overwrite (bool, optional): If False (default), the function will skip existing paths and report an error.
-                                    If True, existing files, symlinks, broken symlinks, or directories will be removed
-                                    before creating the empty file.
+        overwrite (bool, optional): If True, existing destination files will be overwritten.
+                                    If False (default), print an error message and be skip.
+        parents (bool, optional): If True, create parent(s) if not already exists.
+                                  If False (default), print an error message and skip.
 
     Returns:
         makefiles.types.ExitCode: Exit code 0 on full success.
@@ -69,13 +96,13 @@ def create_empty_files(*paths: pathlib.Path, overwrite: bool = False) -> custom_
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
-        try:
-            if utils.isfile(path) or utils.islink(path) or utils.isbrokenlink(path):
-                path.unlink(missing_ok=True)
-            elif utils.isdir(path):
-                shutil.rmtree(path)
-        except FileNotFoundError:
-            pass
+        path_parent: pathlib.Path = path.parent
+        if not (utils.isdir(path_parent) or utils.islinkd(path_parent)) and not parents:
+            cli_io.eprint(f"parent dir {str(path_parent)} does not exists")
+            exitcode = custom_types.ExitCode(1) or exitcode
+            continue
+
+        _clear_hinder(path)
 
         path.touch(exist_ok=False)
 

@@ -39,9 +39,20 @@ def isbrokenlink(path: pathlib.Path) -> bool:
 
 
 def get_version() -> str:
+    """Return current version of tool from `setuptools_scm`'s `_version` file"""
     try:
         import makefiles._version as v
 
         return v.version
     except ImportError:
         return "unknown"
+
+
+def get_hinder(path: pathlib.Path) -> str | None:
+    """Return hinder(if available) which may cause creation of any file/directory be failed"""
+    if isbrokenlink(path) or not (isdir(path) or islinkd(path)):
+        return str(path)
+    if str(path) == "/":
+        return
+
+    return get_hinder(path.parent)

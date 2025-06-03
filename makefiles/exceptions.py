@@ -12,11 +12,11 @@ class InvalidPathError(MKFileException):
         MKFileException.__init__(self, *args)
 
 
-class PathNotFoundError(MKFileException):
+class PathNotFoundError(MKFileException, FileNotFoundError):
     """Path does not exists"""
 
     def __init__(self, *args) -> None:
-        MKFileException.__init__(self, *args)
+        FileNotFoundError.__init__(self, *args)
 
 
 class TemplateCreationError(MKFileException):
