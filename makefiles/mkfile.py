@@ -26,12 +26,18 @@ def _get_available_templates(templates_dir: pathlib.Path) -> list[str]:
     return available_templates
 
 
-def _create_template(template: str, *destinations: pathlib.Path, templates_dir: pathlib.Path) -> custom_types.ExitCode:
+def _create_template(
+    template: str,
+    *destinations: pathlib.Path,
+    templates_dir: pathlib.Path,
+    overwrite: bool,
+    parents: bool,
+) -> custom_types.ExitCode:
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
 
     template_path: pathlib.Path = templates_dir.joinpath(template)
     try:
-        exitcode = fileutils.copy(template_path, *destinations, overwrite=False) or exitcode
+        exitcode = fileutils.copy(template_path, *destinations, overwrite=overwrite, parents=parents) or exitcode
     except exceptions.SourceNotFoundError:
         raise exceptions.TemplateNotFoundError(f"template {template} not found") from None
 
@@ -75,7 +81,9 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
     files_paths: list[pathlib.Path] = list(map(pathlib.Path, files))
 
     if not template:
-        exitcode = fileutils.create_empty_files(*files_paths) or exitcode
+        exitcode = (
+            fileutils.create_empty_files(*files_paths, overwrite=False, parents=cli_arguments.parents) or exitcode
+        )
         return exitcode
 
     if not isinstance(template, str):
@@ -85,7 +93,15 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
             templates_dir=templates_dir,
         )
 
-    exitcode = _create_template(template, *files_paths, templates_dir=templates_dir) or exitcode
+    # fmt:off
+    exitcode = _create_template(
+        template,
+        *files_paths,
+        templates_dir=templates_dir,
+        overwrite=False,
+        parents=cli_arguments.parents,
+    ) or exitcode 
+    # fmt:on
 
     return exitcode
 

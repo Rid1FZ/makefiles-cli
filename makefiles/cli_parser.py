@@ -1,8 +1,6 @@
 import argparse
 
 import makefiles.types as custom_types
-import makefiles.utils as utils
-import makefiles.utils.cli_io as cli_io
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -32,18 +30,25 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         const=object(),
         default=None,
-        help="template to generate. If no template is provided, it will prompt for template.",
+        help="template to generate. If no template is provided, it will prompt for template",
     )
 
     parser.add_argument(
         "-p",
+        "--parents",
+        action="store_true",
+        help="make parents directories as needed",
+    )
+
+    parser.add_argument(
+        "-P",
         "--picker",
         nargs=1,
         action="store",
         type=str,
         choices=["fzf", "manual"],
         default=["manual"],
-        help="which template picker to use. If picker is `fzf`, fzf must be present in PATH. Default is `manual`.",
+        help="which template picker to use. If picker is `fzf`, fzf must be present in PATH. Default is `manual`",
     )
 
     parser.add_argument(
@@ -53,7 +58,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store",
         type=custom_types.NaturalNumber,
         default=[custom_types.NaturalNumber(10)],
-        help="height of fzf window if fzf is used as template picker.",
+        help="height of fzf window if fzf is used as template picker",
     )
 
     parser.add_argument(
