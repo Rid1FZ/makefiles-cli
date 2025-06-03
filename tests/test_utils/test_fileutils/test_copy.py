@@ -20,7 +20,6 @@ class TestCopy(utils.TestMKFile):
         copypath: pathlib.Path = self.tempdir.joinpath("copy")
 
         assert copy(filepath, copypath) == ExitCode(0)
-
         assert utils.compare_files(filepath, copypath)
 
     def test_multiple_regular_files(self, filepath: pathlib.Path) -> None:
@@ -40,7 +39,6 @@ class TestCopy(utils.TestMKFile):
         utils.create_symlink(linkpath, filepath)
 
         assert copy(linkpath, copypath) == ExitCode(0)
-
         assert utils.compare_files(filepath, copypath)
 
     def test_nofile(self) -> None:
@@ -65,3 +63,10 @@ class TestCopy(utils.TestMKFile):
         utils.create_file(copypath)
 
         assert copy(filepath, copypath) == ExitCode(1)
+
+    def test_non_existing_body(self, filepath: pathlib.Path) -> None:
+        copypath: pathlib.Path = self.tempdir.joinpath("random/body/copy")
+
+        assert copy(filepath, copypath, parents=False) == ExitCode(1)
+        assert copy(filepath, copypath, parents=True) == ExitCode(0)
+        assert utils.compare_files(filepath, copypath)
