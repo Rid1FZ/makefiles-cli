@@ -26,7 +26,10 @@ def _clear_hinder(path: pathlib.Path) -> None:
 
 
 def copy(
-    src: pathlib.Path, *dests: pathlib.Path, overwrite: bool = False, parents: bool = False
+    src: pathlib.Path,
+    *dests: pathlib.Path,
+    overwrite: bool = False,
+    parents: bool = False,
 ) -> custom_types.ExitCode:
     """
     Copies a source file or symbolic link to one or more destination paths.
@@ -62,18 +65,23 @@ def copy(
 
         dest_parent: pathlib.Path = dest.parent
         if not (utils.isdir(dest_parent) or utils.islinkd(dest_parent)) and not parents:
-            cli_io.eprint(f"parent dir {str(dest_parent)} does not exists")
+            cli_io.eprint(f"parent dir {str(dest_parent)} does not exists\n")
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
         _clear_hinder(dest)
+        dest_parent.mkdir(parents=True, exist_ok=False)
 
         shutil.copyfile(src, dest, follow_symlinks=True)
 
     return exitcode
 
 
-def create_empty_files(*paths: pathlib.Path, overwrite: bool = False, parents: bool = False) -> custom_types.ExitCode:
+def create_empty_files(
+    *paths: pathlib.Path,
+    overwrite: bool = False,
+    parents: bool = False,
+) -> custom_types.ExitCode:
     """
     Creates empty files at the specified paths, optionally overwriting existing files or directories.
 
@@ -98,11 +106,12 @@ def create_empty_files(*paths: pathlib.Path, overwrite: bool = False, parents: b
 
         path_parent: pathlib.Path = path.parent
         if not (utils.isdir(path_parent) or utils.islinkd(path_parent)) and not parents:
-            cli_io.eprint(f"parent dir {str(path_parent)} does not exists")
+            cli_io.eprint(f"parent dir {str(path_parent)} does not exists\n")
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
         _clear_hinder(path)
+        path_parent.mkdir(parents=True, exist_ok=False)
 
         path.touch(exist_ok=False)
 
