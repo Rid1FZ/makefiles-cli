@@ -111,7 +111,7 @@ def create_empty_files(
             continue
 
         _clear_hinder(path)
-        path_parent.mkdir(parents=True, exist_ok=False)
+        path_parent.mkdir(parents=True, exist_ok=True)
 
         path.touch(exist_ok=False)
 
