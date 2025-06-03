@@ -77,9 +77,9 @@ def generate_tree(
         ValueError: if any of `max_depth`, `max_children`, `max_files` is not an
             instance of `int` class or not is greater than 0.
     """
-    _ensure_natural_number(max_depth, "max_depth")
-    _ensure_natural_number(max_children, "max_children")
-    _ensure_natural_number(max_files, "max_files")
+    _ensure_natural_number(max_depth, name="max_depth")
+    _ensure_natural_number(max_children, name="max_children")
+    _ensure_natural_number(max_files, name="max_files")
 
     root_dir = root_dir.absolute()
     all_files: list[str] = []
@@ -141,6 +141,10 @@ def get_random_str(length: int = 32, *, special_chars: bool = True) -> str:
     Raises:
         ValueError: if `length` is not an integer or not greater than 0.
     """
-    _ensure_natural_number(length, "length")
+    _ensure_natural_number(length, name="length")
 
     return "".join(random.choices(string.printable if special_chars else string.ascii_letters, k=length))
+
+
+def get_random_name() -> str:
+    return get_random_str(random.randint(16, 64), special_chars=False)
