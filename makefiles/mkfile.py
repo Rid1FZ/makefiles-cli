@@ -50,9 +50,6 @@ def _get_template_from_prompt(
     fzf_height: custom_types.NaturalNumber = custom_types.NaturalNumber(10),
     templates_dir: pathlib.Path,
 ) -> str:
-    """
-    Prompt the user using the fzf or manual prompt to choose template.
-    """
     available_templates: list[str] = _get_available_templates(templates_dir)
 
     if t_picker == "fzf":
