@@ -7,20 +7,15 @@ import makefiles.utils as utils
 import makefiles.utils.cli_io as cli_io
 
 
-def _clear_hinder(path: pathlib.Path) -> None:
+def _remove_path(path: pathlib.Path) -> None:
     """
-    Remove/unlink any hinder which may cause creation of `path` to be failed.
+    Remove/Unlink `path` recursively.
     """
-    hinder: str | None = utils.get_hinder(path)
-    if not hinder:
-        return
-
-    hinder_path: pathlib.Path = pathlib.Path(hinder)
     try:
-        if utils.isfile(hinder_path) or utils.islink(hinder_path) or utils.isbrokenlink(hinder_path):
-            hinder_path.unlink(missing_ok=True)
-        elif utils.isdir(hinder_path):
-            shutil.rmtree(hinder_path)
+        if utils.isfile(path) or utils.islink(path) or utils.isbrokenlink(path):
+            path.unlink(missing_ok=True)
+        elif utils.isdir(path):
+            shutil.rmtree(path)
     except FileNotFoundError:
         pass
 
@@ -69,7 +64,7 @@ def copy(
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
-        _clear_hinder(dest)
+        _remove_path(dest)
         dest_parent.mkdir(parents=True, exist_ok=True)
 
         shutil.copyfile(src, dest, follow_symlinks=True)
@@ -110,7 +105,7 @@ def create_empty_files(
             exitcode = custom_types.ExitCode(1) or exitcode
             continue
 
-        _clear_hinder(path)
+        _remove_path(path)
         path_parent.mkdir(parents=True, exist_ok=True)
 
         path.touch(exist_ok=False)
