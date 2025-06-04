@@ -1,6 +1,6 @@
 # makefiles-cli - Command line interface for XDG_TEMPLATES_DIR
 
-makefiles-cli is a simple commandline tool to create files and templates. It can create one or more empty files or any template defined in `XDG_TEMPLATES_DIR`. It also has support for [fzf](https://github.com/junegunn/fzf) to make it easier to find template.
+`makefiles-cli` is a simple commandline tool to create files and templates. It can create one or more empty files or any template defined in `XDG_TEMPLATES_DIR`. It also has support for [fzf](https://github.com/junegunn/fzf) to make it easier to find template.
 
 ## Usage
 
@@ -28,6 +28,8 @@ Create template using `fzf` as picker to pick template interactively:
 mkfile script.py --template --picker="fzf"
 ```
 
+Run `mkfile --help` for all the available options.
+
 ## Installation
 
 _Requirements_:
@@ -39,4 +41,10 @@ You can install `makefiles-cli` directly from **PyPI** using `pip`:
 
 ```bash
 pip install makefiles-cli
+```
+
+Or if you love to stay on bleeding edge, install directly from github:
+
+```bash
+pip install git+https://github.com/Rid1FZ/makefiles-cli
 ```
