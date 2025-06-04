@@ -62,7 +62,9 @@ class TestCopy(utils.TestMKFile):
 
         utils.create_file(copypath)
 
-        assert copy(filepath, copypath) == ExitCode(1)
+        assert copy(filepath, copypath, overwrite=False) == ExitCode(1)
+        assert copy(filepath, copypath, overwrite=True) == ExitCode(0)
+        assert utils.compare_files(filepath, copypath)
 
     def test_non_existing_body(self, filepath: pathlib.Path) -> None:
         copypath: pathlib.Path = self.tempdir.joinpath(f"{utils.get_random_name()}/{utils.get_random_name()}")

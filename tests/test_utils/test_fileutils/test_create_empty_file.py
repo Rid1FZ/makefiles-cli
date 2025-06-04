@@ -30,7 +30,9 @@ class TestCreateEmptyFile(utils.TestMKFile):
 
         utils.create_file(filepath)
 
-        assert create_empty_files(filepath) == ExitCode(1)
+        assert create_empty_files(filepath, overwrite=False) == ExitCode(1)
+        assert create_empty_files(filepath, overwrite=True) == ExitCode(0)
+        assert _is_file(filepath)
 
     def test_non_existing_body(self) -> None:
         filepath: pathlib.Path = self.tempdir.joinpath(f"{utils.get_random_name()}/{utils.get_random_name()}")
