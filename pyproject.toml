@@ -25,11 +25,19 @@ requires = ["setuptools>=42", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-dev = [
+build = [
+    "setuptools>=80.9.0",
+    "setuptools-scm>=8.3.1",
+]
+editor = [
     "black>=25.1.0",
     "isort>=6.0.1",
     "pyright>=1.1.401",
+]
+testing = [
     "pytest>=8.3.5",
+    "setuptools>=80.9.0",
+    "setuptools-scm>=8.3.1",
 ]
 
 [tool.black]
