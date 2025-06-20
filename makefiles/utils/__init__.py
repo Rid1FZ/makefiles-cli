@@ -1,4 +1,3 @@
-import os.path
 import pathlib
 
 
@@ -12,7 +11,7 @@ def exists(path: pathlib.Path) -> bool:
     Returns:
         bool: True if the path exists or is a broken symlink, False otherwise.
     """
-    return os.path.lexists(path)
+    return path.exists() or path.is_symlink()
 
 
 def isfile(path: pathlib.Path) -> bool:
