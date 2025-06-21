@@ -27,8 +27,7 @@ class TestCopy(utils.TestMKFile):
             self.tempdir.joinpath(utils.get_random_name()) for _ in range(1, random.randint(5, 20))
         ]
 
-        for cpath in copypaths:
-            assert copy(filepath, cpath) == ExitCode(0)
+        assert copy(filepath, *copypaths) == ExitCode(0)
 
         assert all(utils.compare_files(filepath, cpath) for cpath in copypaths)
 
