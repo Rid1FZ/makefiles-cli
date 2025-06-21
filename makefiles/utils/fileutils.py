@@ -47,6 +47,9 @@ def copy(
     """
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
 
+    if not dests:
+        raise ValueError(f"at least 1 destination expected. Got {len(dests)}")
+
     if not utils.exists(src):
         raise exceptions.SourceNotFoundError(f"source {str(src)} does not exists")
     elif not (utils.isfile(src) or utils.islinkf(src)):
@@ -92,6 +95,9 @@ def create_empty_files(
                                   Exit code 1 if any file already exists and overwrite is False.
     """
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
+
+    if not paths:
+        raise ValueError(f"at least on path expected. Got {len(paths)}")
 
     for path in paths:
         if utils.exists(path) and not overwrite:

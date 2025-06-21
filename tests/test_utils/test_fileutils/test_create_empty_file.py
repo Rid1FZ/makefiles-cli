@@ -1,6 +1,8 @@
 import pathlib
 import random
 
+import pytest
+
 import tests.utils as utils
 from makefiles.types import ExitCode
 from makefiles.utils.fileutils import create_empty_files
@@ -24,6 +26,10 @@ class TestCreateEmptyFile(utils.TestMKFile):
 
         assert create_empty_files(*filepaths) == ExitCode(0)
         assert all(_is_file(filepath) for filepath in filepaths)
+
+    def test_no_destination(self) -> None:
+        with pytest.raises(ValueError):
+            create_empty_files()
 
     def test_existing_file(self) -> None:
         filepath: pathlib.Path = self.tempdir.joinpath(utils.get_random_name())

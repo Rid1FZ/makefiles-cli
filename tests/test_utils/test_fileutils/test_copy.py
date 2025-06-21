@@ -32,6 +32,10 @@ class TestCopy(utils.TestMKFile):
 
         assert all(utils.compare_files(filepath, cpath) for cpath in copypaths)
 
+    def test_no_destination(self, filepath: pathlib.Path) -> None:
+        with pytest.raises(ValueError):
+            assert copy(filepath)
+
     def test_symlink(self, filepath: pathlib.Path) -> None:
         linkpath: pathlib.Path = self.tempdir.joinpath(utils.get_random_name())
         copypath: pathlib.Path = self.tempdir.joinpath(utils.get_random_name())
