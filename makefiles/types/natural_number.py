@@ -8,6 +8,11 @@ class NaturalNumber(int):
     This class enforces validation at instantiation time. Any attempt to create a
     `NaturalNumber` with a non-integer, zero, or negative value will raise an error.
 
+    Parameters:
+        x (Any): A value that can be converted to an integer. Must represent a positive
+            integer greater than zero. Accepts integers, numeric strings, or any type
+            that supports conversion via `int(x)`.
+
     Examples:
         >>> NaturalNumber(5)
         5
