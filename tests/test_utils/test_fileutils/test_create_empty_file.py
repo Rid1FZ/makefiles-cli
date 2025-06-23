@@ -12,7 +12,7 @@ def _is_file(path: pathlib.Path) -> bool:
     return path.is_file() and not path.is_symlink()
 
 
-class TestCreateEmptyFile(utils.TestMKFile):
+class TestCreateEmptyFile(utils.MakefilesTestBase):
     def test_one_file(self) -> None:
         filepath: pathlib.Path = self.tempdir.joinpath(utils.get_random_name())
 

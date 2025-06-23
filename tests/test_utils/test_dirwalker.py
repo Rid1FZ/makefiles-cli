@@ -6,10 +6,9 @@ import pytest
 import makefiles.exceptions as exceptions
 import makefiles.utils.dirwalker as dirwalker
 import tests.utils as utils
-from tests.utils.setup_test import TestMKFile
 
 
-class TestDirWalker(TestMKFile):
+class TestDirWalker(utils.MakefilesTestBase):
     @pytest.fixture
     def filetree(self) -> list[str]:
         return utils.generate_tree(

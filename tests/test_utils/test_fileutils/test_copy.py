@@ -9,7 +9,7 @@ from makefiles.types import ExitCode
 from makefiles.utils.fileutils import copy
 
 
-class TestCopy(utils.TestMKFile):
+class TestCopy(utils.MakefilesTestBase):
     @pytest.fixture
     def filepath(self) -> pathlib.Path:
         path: pathlib.Path = self.tempdir.joinpath(utils.get_random_name())
