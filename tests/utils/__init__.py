@@ -10,8 +10,10 @@ __all__: list[str] = [
     "TestMKFile",
     "compare_files",
     "create_file",
+    "generate_tree",
     "create_symlink",
     "get_random_str",
+    "get_random_name",
 ]
 
 compare_files: functools.partial = functools.partial(filecmp.cmp, shallow=False)
