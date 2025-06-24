@@ -55,6 +55,8 @@ version_file = "makefiles/_version.py"
 script-files = ["mkfile"]
 packages = [
     "makefiles",
+    "makefiles.types",
     "makefiles.utils",
+    "makefiles.utils.fileutils",
     "makefiles.utils.picker"
 ]

@@ -78,9 +78,13 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
     files_paths: list[pathlib.Path] = list(map(pathlib.Path, files))
 
     if not template:
-        exitcode = (
-            fileutils.create_empty_files(*files_paths, overwrite=False, parents=cli_arguments.parents) or exitcode
-        )
+        # fmt:off
+        exitcode = fileutils.create_empty_files(
+                *files_paths,
+                overwrite=False,
+                parents=cli_arguments.parents,
+            ) or exitcode
+        # fmt:on
         return exitcode
 
     if not isinstance(template, str):
