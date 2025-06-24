@@ -28,7 +28,7 @@ def _get_available_templates(templates_dir: pathlib.Path) -> list[str]:
 
 def _create_template(
     template: str,
-    *destinations: pathlib.Path,
+    destinations: tuple[pathlib.Path, ...],
     templates_dir: pathlib.Path,
     overwrite: bool,
     parents: bool,
@@ -37,7 +37,7 @@ def _create_template(
 
     template_path: pathlib.Path = templates_dir.joinpath(template)
     try:
-        exitcode = fileutils.copy_file(template_path, *destinations, overwrite=overwrite, parents=parents) or exitcode
+        exitcode = fileutils.copy_file(template_path, destinations, overwrite=overwrite, parents=parents) or exitcode
     except exceptions.SourceNotFoundError:
         raise exceptions.TemplateNotFoundError(f"template {template} not found") from None
 
@@ -75,12 +75,12 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
         cli_io.print(f"{"\n".join(_get_available_templates(templates_dir))}\n")
         return exitcode
 
-    files_paths: list[pathlib.Path] = list(map(pathlib.Path, files))
+    files_paths: tuple[pathlib.Path, ...] = tuple(map(pathlib.Path, files))
 
     if not template:
         # fmt:off
         exitcode = fileutils.create_empty_files(
-                *files_paths,
+                files_paths,
                 overwrite=False,
                 parents=cli_arguments.parents,
             ) or exitcode
@@ -97,7 +97,7 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
     # fmt:off
     exitcode = _create_template(
         template,
-        *files_paths,
+        files_paths,
         templates_dir=templates_dir,
         overwrite=False,
         parents=cli_arguments.parents,

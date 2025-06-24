@@ -32,14 +32,14 @@ class TestCopy(utils.MakefilesTestBase):
         """Copies a regular file to a single destination."""
         dest = self.tempdir.joinpath(utils.get_random_name())
 
-        assert copy_file(filepath, dest) == ExitCode(0)
+        assert copy_file(filepath, (dest,)) == ExitCode(0)
         assert utils.compare_files(filepath, dest)
 
     def test_copy_multiple_files(self, filepath: pathlib.Path) -> None:
         """Copies a file to multiple destinations."""
-        destinations = [self.tempdir.joinpath(utils.get_random_name()) for _ in range(random.randint(5, 10))]
+        destinations = tuple(self.tempdir.joinpath(utils.get_random_name()) for _ in range(random.randint(5, 10)))
 
-        result = copy_file(filepath, *destinations)
+        result = copy_file(filepath, destinations)
         assert result == ExitCode(0)
         for dest in destinations:
             assert utils.compare_files(filepath, dest)
@@ -53,7 +53,7 @@ class TestCopy(utils.MakefilesTestBase):
         """Copies a symlink to a file, content should match the target."""
         dest = self.tempdir.joinpath(utils.get_random_name())
 
-        assert copy_file(symlink_to_file, dest) == ExitCode(0)
+        assert copy_file(symlink_to_file, (dest,)) == ExitCode(0)
         assert utils.compare_files(filepath, dest)
 
     def test_copy_nonexistent_source_raises(self) -> None:
@@ -62,7 +62,7 @@ class TestCopy(utils.MakefilesTestBase):
         dest = self.tempdir.joinpath(utils.get_random_name())
 
         with pytest.raises(exceptions.SourceNotFoundError):
-            copy_file(missing, dest)
+            copy_file(missing, (dest,))
 
     def test_copy_non_file_source_raises(self) -> None:
         """Raises InvalidSourceError if source is a directory."""
@@ -72,7 +72,7 @@ class TestCopy(utils.MakefilesTestBase):
         dir_path.mkdir()
 
         with pytest.raises(exceptions.InvalidSourceError):
-            copy_file(dir_path, dest)
+            copy_file(dir_path, (dest,))
 
     def test_copy_broken_symlink_raises(self) -> None:
         """Raises SourceNotFoundError for a broken symlink."""
@@ -83,7 +83,7 @@ class TestCopy(utils.MakefilesTestBase):
         broken_symlink.symlink_to(broken_target)
 
         with pytest.raises(exceptions.InvalidSourceError):
-            copy_file(broken_symlink, dest)
+            copy_file(broken_symlink, (dest,))
 
     def test_copy_over_existing_dest(self, filepath: pathlib.Path) -> None:
         """Handles overwriting and not overwriting an existing destination."""
@@ -92,12 +92,12 @@ class TestCopy(utils.MakefilesTestBase):
         utils.create_file(dest)
 
         # Without overwrite
-        result = copy_file(filepath, dest, overwrite=False)
+        result = copy_file(filepath, (dest,), overwrite=False)
         assert result == ExitCode(1)
         assert not utils.compare_files(filepath, dest)
 
         # With overwrite
-        result = copy_file(filepath, dest, overwrite=True)
+        result = copy_file(filepath, (dest,), overwrite=True)
         assert result == ExitCode(0)
         assert utils.compare_files(filepath, dest)
 
@@ -106,23 +106,23 @@ class TestCopy(utils.MakefilesTestBase):
         nested = self.tempdir.joinpath(utils.get_random_name()).joinpath(utils.get_random_name())
 
         # Without creating parents
-        result = copy_file(filepath, nested, parents=False)
+        result = copy_file(filepath, (nested,), parents=False)
         assert result == ExitCode(1)
         assert not nested.exists()
 
         # With parent creation
-        result = copy_file(filepath, nested, parents=True)
+        result = copy_file(filepath, (nested,), parents=True)
         assert result == ExitCode(0)
         assert utils.compare_files(filepath, nested)
 
     def test_copy_to_multiple_existing_dests(self, filepath: pathlib.Path) -> None:
         """Fails if all destinations exist and overwrite=False."""
-        dests = [self.tempdir.joinpath(utils.get_random_name()) for _ in range(3)]
+        dests = tuple(self.tempdir.joinpath(utils.get_random_name()) for _ in range(3))
 
         for d in dests:
             utils.create_file(d)
 
-        result = copy_file(filepath, *dests, overwrite=False)
+        result = copy_file(filepath, dests, overwrite=False)
         assert result == ExitCode(1)
 
     def test_copy_to_partial_existing_dests(self, filepath: pathlib.Path) -> None:
@@ -132,7 +132,7 @@ class TestCopy(utils.MakefilesTestBase):
 
         utils.create_file(existing)
 
-        result = copy_file(filepath, existing, new, overwrite=False)
+        result = copy_file(filepath, (existing, new), overwrite=False)
         assert result == ExitCode(1)
         assert not utils.compare_files(filepath, existing)
         assert utils.compare_files(filepath, new)
@@ -147,7 +147,7 @@ class TestCopy(utils.MakefilesTestBase):
         link.symlink_to(dir_path)
 
         with pytest.raises(exceptions.InvalidSourceError):
-            copy_file(link, dest)
+            copy_file(link, (dest,))
 
     def test_dest_parent_is_file(self, filepath: pathlib.Path) -> None:
         """Fails when parent of dest is a file, not a directory."""
@@ -156,8 +156,8 @@ class TestCopy(utils.MakefilesTestBase):
 
         utils.create_file(parent_file, empty=True)
 
-        result = copy_file(filepath, dest, parents=False)
+        result = copy_file(filepath, (dest,), parents=False)
         assert result == ExitCode(1)
 
         with pytest.raises(OSError):
-            copy_file(filepath, dest, parents=True)
+            copy_file(filepath, (dest,), parents=True)
