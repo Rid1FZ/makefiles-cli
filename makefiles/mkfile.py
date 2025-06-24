@@ -37,7 +37,7 @@ def _create_template(
 
     template_path: pathlib.Path = templates_dir.joinpath(template)
     try:
-        exitcode = fileutils.copy(template_path, *destinations, overwrite=overwrite, parents=parents) or exitcode
+        exitcode = fileutils.copy_file(template_path, *destinations, overwrite=overwrite, parents=parents) or exitcode
     except exceptions.SourceNotFoundError:
         raise exceptions.TemplateNotFoundError(f"template {template} not found") from None
 
