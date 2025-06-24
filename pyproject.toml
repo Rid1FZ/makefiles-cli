@@ -43,6 +43,9 @@ testing = [
 [tool.black]
 line-length = 120
 
+[tool.isort]
+line_length = 120
+
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
