@@ -8,7 +8,7 @@ class OperationResult:
         self,
         result: Any = None,
         *,
-        returncode: ExitCode | int = ExitCode(0),
+        returncode: ExitCode | int | str = ExitCode(0),
         output_message: str | bytes = "",
         error_message: str | bytes = "",
     ):
@@ -27,7 +27,7 @@ class OperationResult:
 
     Attributes:
         result (Any): The payload result of the operation. Can be any type.
-        returncode (ExitCode): The exit status code of the operation (0–255).
+        returncode (ExitCode | int | str): The exit status code of the operation (0–255).
         output_message (str): Standard output message. Accepts `str` or `bytes`.
         error_message (str): Standard error message. Accepts `str` or `bytes`.
 
@@ -87,7 +87,7 @@ class OperationResult:
         return self._returncode
 
     @returncode.setter
-    def returncode(self, value: ExitCode | int):
+    def returncode(self, value: ExitCode | int | str) -> None:
         if not isinstance(value, ExitCode):
             try:
                 value = ExitCode(value)

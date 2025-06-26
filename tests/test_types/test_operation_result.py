@@ -8,7 +8,7 @@ class TestOperationResult:
 
     def test_default_construction(self) -> None:
         """Test that default arguments are assigned correctly."""
-        result = OperationResult()
+        result: OperationResult = OperationResult()
         assert result.result is None
         assert result.returncode == ExitCode(0)
         assert result.output_message == ""
@@ -23,20 +23,23 @@ class TestOperationResult:
             "3",
         ],
     )
-    def test_returncode_accepts_int_or_exitcode(self, code) -> None:
+    def test_returncode_accepts_int_or_exitcode(self, code: str | int | ExitCode) -> None:
         """Test that returncode accepts int and ExitCode and is coerced correctly."""
-        obj = OperationResult("data", returncode=code)
+        obj: OperationResult = OperationResult("data", returncode=code)
+
         assert isinstance(obj.returncode, ExitCode)
         assert int(obj.returncode) == int(code)
 
     def test_output_and_error_messages_accept_str_and_bytes(self) -> None:
         """Test that messages are accepted as str or bytes and decoded properly."""
-        obj = OperationResult("res", output_message=b"stdout", error_message=b"stderr")
+        obj: OperationResult = OperationResult("res", output_message=b"stdout", error_message=b"stderr")
+
         assert obj.output_message == "stdout"
         assert obj.error_message == "stderr"
 
         obj.output_message = "new out"
         obj.error_message = "new err"
+
         assert obj.output_message == "new out"
         assert obj.error_message == "new err"
 
@@ -79,14 +82,17 @@ class TestOperationResult:
     )
     def test_invalid_message_type_raises_typeerror(self, field, invalid_value):
         """Test that non-str/bytes messages raise TypeError."""
-        obj = OperationResult("res")
+        obj: OperationResult = OperationResult("res")
+
         with pytest.raises(TypeError, match=f"{field} must be str or bytes"):
             setattr(obj, field, invalid_value)
 
     def test_str_representation(self) -> None:
         """Test the __str__ method produces expected format."""
-        obj = OperationResult(result={"a": 1}, returncode=0, output_message="done", error_message="")
-        stringified = str(obj)
+        obj: OperationResult = OperationResult(result={"a": 1}, returncode=0, output_message="done", error_message="")
+
+        stringified: str = str(obj)
+
         assert "OperationResult(" in stringified
         assert "result={'a': 1}" in stringified
         assert "returncode=0" in stringified

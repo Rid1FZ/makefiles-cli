@@ -20,9 +20,9 @@ class TestExitCode:
             ("100", 100),
         ],
     )
-    def test_valid_exit_codes(self, valid_input: Any, expected: Any) -> None:
+    def test_valid_exit_codes(self, valid_input: str | int, expected: int) -> None:
         """Test valid exit codes as int or digit-only string."""
-        code = ExitCode(valid_input)
+        code: ExitCode = ExitCode(valid_input)
         assert isinstance(code, ExitCode)
         assert isinstance(code, int)
         assert code == expected
@@ -60,7 +60,7 @@ class TestExitCode:
             " 1",  # leading space
         ],
     )
-    def test_invalid_exitcode_string_raises_typeerror(self, bad_str: Any):
+    def test_invalid_exitcode_string_raises_typeerror(self, bad_str: str):
         """Test that invalid strings raise TypeError."""
         with pytest.raises(TypeError, match=r"Invalid literal for ExitCode"):
             ExitCode(bad_str)
@@ -74,7 +74,7 @@ class TestExitCode:
             "300",
         ],
     )
-    def test_exitcode_out_of_range_raises_valueerror(self, out_of_range: Any):
+    def test_exitcode_out_of_range_raises_valueerror(self, out_of_range: str | int):
         """Test that out-of-range values raise ValueError."""
         with pytest.raises(ValueError, match=r"ExitCode must be in range of \[0,255\]"):
             ExitCode(out_of_range)

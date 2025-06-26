@@ -1,4 +1,5 @@
 import random
+from pathlib import Path
 
 import pytest
 
@@ -25,14 +26,14 @@ class TestDirWalker(utils.MakefilesTestBase):
 
     def test_invalid_path_raises(self) -> None:
         """Should raise InvalidPathError if input is not a dir or symlink to dir."""
-        invalid_path = self.tempdir.joinpath(utils.get_random_name())
+        invalid_path: Path = self.tempdir.joinpath(utils.get_random_name())
 
         with pytest.raises(exceptions.InvalidPathError):
             dirwalker.listf(invalid_path)
 
     def test_hidden_files_are_ignored(self) -> None:
         """Hidden files should not appear in the output."""
-        hidden_file = self.tempdir.joinpath(f".{utils.get_random_name()}")
+        hidden_file: Path = self.tempdir.joinpath(f".{utils.get_random_name()}")
 
         utils.create_file(hidden_file)
 
@@ -40,8 +41,8 @@ class TestDirWalker(utils.MakefilesTestBase):
 
     def test_hidden_dirs_are_ignored(self) -> None:
         """Hidden directories and their contents should be skipped."""
-        hidden_dir = self.tempdir.joinpath(f".{utils.get_random_name()}")
-        file_inside = hidden_dir.joinpath(utils.get_random_name())
+        hidden_dir: Path = self.tempdir.joinpath(f".{utils.get_random_name()}")
+        file_inside: Path = hidden_dir.joinpath(utils.get_random_name())
 
         hidden_dir.mkdir(parents=True)
         utils.create_file(file_inside)
@@ -50,8 +51,8 @@ class TestDirWalker(utils.MakefilesTestBase):
 
     def test_symlink_to_dir(self) -> None:
         """Should list files under a symlinked directory."""
-        real_dir = self.tempdir.joinpath(utils.get_random_name())
-        link_dir = self.tempdir.joinpath(utils.get_random_name())
+        real_dir: Path = self.tempdir.joinpath(utils.get_random_name())
+        link_dir: Path = self.tempdir.joinpath(utils.get_random_name())
         file_inside = real_dir.joinpath("f.txt")
 
         real_dir.mkdir()
@@ -62,8 +63,8 @@ class TestDirWalker(utils.MakefilesTestBase):
 
     def test_symlink_inside_tree_included(self) -> None:
         """If a file symlink exists in tree, it should be included as a file."""
-        target = self.tempdir.joinpath("original.txt")
-        link = self.tempdir.joinpath("linked.txt")
+        target: Path = self.tempdir.joinpath("original.txt")
+        link: Path = self.tempdir.joinpath("linked.txt")
 
         utils.create_file(target)
         link.symlink_to(target)
@@ -76,11 +77,11 @@ class TestDirWalker(utils.MakefilesTestBase):
 
     def test_dot_files_not_in_subdirs(self) -> None:
         """Hidden files in subdirectories should be ignored."""
-        subdir = self.tempdir.joinpath("sub")
+        subdir: Path = self.tempdir.joinpath("sub")
         subdir.mkdir()
 
-        visible_file = subdir.joinpath("x.txt")
-        hidden_file = subdir.joinpath(".x.txt")
+        visible_file: Path = subdir.joinpath("x.txt")
+        hidden_file: Path = subdir.joinpath(".x.txt")
 
         utils.create_file(visible_file)
         utils.create_file(hidden_file)

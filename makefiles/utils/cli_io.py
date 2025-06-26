@@ -12,7 +12,7 @@ import io
 import sys
 
 
-def _write_to_stream(text: str, *, stream: io.TextIOWrapper) -> None:
+def _write_to_stream(text: str, *, stream: io.StringIO) -> None:
     try:
         stream.write(text)
     except UnicodeEncodeError:
@@ -41,7 +41,7 @@ def print(text: str) -> None:
     Side Effects:
         Flushes the stdout buffer immediately after writing.
     """
-    stream: io.TextIOWrapper = sys.stdout  # type:ignore
+    stream: io.StringIO = sys.stdout  # type:ignore
     _write_to_stream(text, stream=stream)
     stream.flush()
 
@@ -60,7 +60,7 @@ def eprint(text: str) -> None:
     Side Effects:
         Flushes the stderr buffer immediately after writing.
     """
-    stream: io.TextIOWrapper = sys.stderr  # type:ignore
+    stream: io.StringIO = sys.stderr  # type:ignore
     _write_to_stream(text, stream=stream)
     stream.flush()
 
@@ -76,6 +76,6 @@ def input() -> str:
         This function reads directly from `sys.stdin` to avoid inconsistencies
         sometimes observed with the built-in `input` function.
     """
-    stream: io.TextIOWrapper = sys.stdin  # type:ignore
+    stream: io.StringIO = sys.stdin  # type:ignore
     input: str = stream.readline().rstrip("\n")
     return input

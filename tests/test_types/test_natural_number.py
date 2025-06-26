@@ -18,9 +18,9 @@ class TestNaturalNumber:
             ("500", 500),
         ],
     )
-    def test_valid_natural_numbers(self, valid_input: Any, expected: Any) -> None:
+    def test_valid_natural_numbers(self, valid_input: str | int, expected: int) -> None:
         """Test valid natural numbers from int and digit-only str."""
-        n = NaturalNumber(valid_input)
+        n: NaturalNumber = NaturalNumber(valid_input)
         assert isinstance(n, NaturalNumber)
         assert isinstance(n, int)
         assert n == expected
@@ -62,7 +62,7 @@ class TestNaturalNumber:
             " 1",
         ],
     )
-    def test_invalid_naturalnumber_string_raises_typeerror_or_valueerror(self, bad_str: Any) -> None:
+    def test_invalid_naturalnumber_string_raises_typeerror_or_valueerror(self, bad_str: str) -> None:
         """Test that invalid string inputs raise appropriate errors."""
         with pytest.raises((TypeError, ValueError), match="NaturalNumber"):
             NaturalNumber(bad_str)
