@@ -4,19 +4,6 @@ from makefiles.types import ExitCode
 
 
 class OperationResult:
-    def __init__(
-        self,
-        result: Any = None,
-        *,
-        returncode: ExitCode | int | str = ExitCode(0),
-        output_message: str | bytes = "",
-        error_message: str | bytes = "",
-    ):
-        self.result = result
-        self.returncode = returncode
-        self.output_message = output_message
-        self.error_message = error_message
-
     """
     A container representing the result of an operation or subprocess execution.
 
@@ -56,6 +43,19 @@ class OperationResult:
         >>> str(result)
         "OperationResult(result={'status': 'success'}, returncode=0, output_message='done', error_message='')"
     """
+
+    def __init__(
+        self,
+        result: Any = None,
+        *,
+        returncode: ExitCode | int | str = ExitCode(0),
+        output_message: str | bytes = "",
+        error_message: str | bytes = "",
+    ):
+        self.result = result
+        self.returncode = returncode
+        self.output_message = output_message
+        self.error_message = error_message
 
     def __str__(self) -> str:
         result: Any = self.result
