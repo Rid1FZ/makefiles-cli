@@ -8,8 +8,8 @@ class TestOperationResult:
 
     def test_default_construction(self) -> None:
         """Test that default arguments are assigned correctly."""
-        result = OperationResult("success")
-        assert result.result == "success"
+        result = OperationResult()
+        assert result.result is None
         assert result.returncode == ExitCode(0)
         assert result.output_message == ""
         assert result.error_message == ""

@@ -6,7 +6,7 @@ from makefiles.types import ExitCode
 class OperationResult:
     def __init__(
         self,
-        result: Any,
+        result: Any = None,
         *,
         returncode: ExitCode | int = ExitCode(0),
         output_message: str | bytes = "",
