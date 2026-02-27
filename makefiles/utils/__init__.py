@@ -128,9 +128,18 @@ def get_hinder(path: pathlib.Path) -> str | None:
     Returns:
         str | None: The problematic path component as a string, or None if no hindrance is found.
     """
-    if isbrokenlink(path) or not (isdir(path) or islinkd(path)):
-        return str(path)
     if str(path) == "/":
-        return
+        return None
 
-    return get_hinder(path.parent)
+    if isbrokenlink(path):
+        return str(path)
+
+    if isdir(path) or islinkd(path):
+        return None
+
+    if not exists(path):
+        return get_hinder(path.parent)
+
+    # Path exists but is not a directory (e.g. a regular file or a symlink to a
+    # file).  It blocks the creation of anything beneath it.
+    return str(path)
