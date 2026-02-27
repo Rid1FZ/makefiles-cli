@@ -5,7 +5,7 @@ import makefiles.exceptions as exceptions
 import makefiles.utils as utils
 import makefiles.utils.cli_io as cli_io
 import makefiles.utils.fileutils as fileutils
-from makefiles.types import ExitCode, NaturalNumber, OperationResult
+from makefiles.types import ExitCode, NaturalNumber
 
 
 def copy(
