@@ -15,11 +15,11 @@ def prompt(options: list[str]) -> str:
     options = sorted(options)  # do not modify the parameter
 
     for index, option in enumerate(options, start=1):
-        cli_io.print(f"[{index}]: {option}\n")
+        cli_io.eprint(f"[{index}]: {option}\n")
 
     while True:
         try:
-            cli_io.print("Choose a template: ")
+            cli_io.eprint("Choose a template: ")
             choice: custom_types.NaturalNumber = custom_types.NaturalNumber(cli_io.input())
             assert choice <= len(options)
             break

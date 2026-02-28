@@ -14,14 +14,13 @@ class TestSimplePrompt:
 
         with (
             mock.patch.object(cli_io, "input", return_value=user_input),
-            mock.patch.object(cli_io, "print") as mock_print,
+            mock.patch.object(cli_io, "eprint") as mock_eprint,
         ):
-
             result: str = manual(options)
             assert result == "charlie"
 
             # Print should include numbered options
-            printed_lines: list[str] = [call.args[0] for call in mock_print.call_args_list]
+            printed_lines: list[str] = [call.args[0] for call in mock_eprint.call_args_list]
             assert "[1]: alpha" in printed_lines[0]
             assert "[2]: charlie" in printed_lines[1]
             assert "[3]: delta" in printed_lines[2]
@@ -34,12 +33,13 @@ class TestSimplePrompt:
 
         with (
             mock.patch.object(cli_io, "input", side_effect=[bad_input, valid_input]),
-            mock.patch.object(cli_io, "print") as mock_print,
             mock.patch.object(cli_io, "eprint") as mock_eprint,
         ):
             result: str = manual(options)
             assert result == "one"
-            mock_eprint.assert_called_with("Please insert a valid input\n")
+            # Check that the error message was among the eprint calls
+            error_calls = [call.args[0] for call in mock_eprint.call_args_list]
+            assert "Please insert a valid input\n" in error_calls
 
     def test_exact_bounds_selection(self):
         """Should accept lowest and highest valid index values."""
