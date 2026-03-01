@@ -17,6 +17,9 @@ keywords = ["makefiles", "mkfiles", "mkfile", "makefiles-cli", "mkfile-cli"]
 dependencies = []
 requires-python = ">=3.10"
 
+[project.scripts]
+mkfile = "makefiles.mkfile:main"
+
 [project.urls]
 Homepage = "https://github.com/Rid1FZ/makefiles-cli"
 
@@ -51,12 +54,6 @@ version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
 version_file = "makefiles/_version.py"
 
-[tool.setuptools]
-script-files = ["mkfile"]
-packages = [
-    "makefiles",
-    "makefiles.types",
-    "makefiles.utils",
-    "makefiles.utils.fileutils",
-    "makefiles.utils.picker"
-]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["makefiles*"]
