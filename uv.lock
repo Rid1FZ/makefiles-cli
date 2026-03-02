@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 
 [[package]]
@@ -90,6 +90,9 @@ wheels = [
 [[package]]
 name = "makefiles-cli"
 source = { editable = "." }
+dependencies = [
+    { name = "typing-extensions" },
+]
 
 [package.dev-dependencies]
 build = [
@@ -108,6 +111,7 @@ testing = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "typing-extensions", specifier = ">=4.13.2" }]
 
 [package.metadata.requires-dev]
 build = [

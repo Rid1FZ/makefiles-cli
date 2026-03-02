@@ -4,11 +4,11 @@ import subprocess
 import makefiles.exceptions as exceptions
 import makefiles.types as custom_types
 
-FZF_DEFAULT_FLAGS: list[str] = [
+FZF_DEFAULT_FLAGS: tuple[str, ...] = (
     "--style=minimal",
     "--info=hidden",
     "--keep-right",
-]
+)
 
 
 def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_types.NaturalNumber(10)) -> str:

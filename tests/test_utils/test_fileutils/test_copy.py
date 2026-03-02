@@ -161,5 +161,5 @@ class TestCopy(utils.MakefilesTestBase):
         result: ExitCode = copy_file(filepath, (dest,), parents=False)
         assert result == ExitCode(1)
 
-        with pytest.raises(OSError):
+        with pytest.raises(exceptions.InvalidPathError):
             copy_file(filepath, (dest,), parents=True)

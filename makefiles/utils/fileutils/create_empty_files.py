@@ -1,5 +1,6 @@
 import pathlib
 
+import makefiles.exceptions as exceptions
 import makefiles.utils as utils
 import makefiles.utils.cli_io as cli_io
 import makefiles.utils.fileutils as fileutils
@@ -29,7 +30,7 @@ def create(
     exitcode: ExitCode = ExitCode(0)
 
     if not paths:
-        raise ValueError(f"at least on path expected. Got {len(paths)}")
+        raise ValueError(f"at least one path expected. Got {len(paths)}")
 
     for path in paths:
         if utils.exists(path) and not overwrite:
@@ -44,7 +45,10 @@ def create(
             continue
 
         fileutils.remove_path(path)
-        path_parent.mkdir(parents=True, exist_ok=True)
+        try:
+            path_parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            raise exceptions.InvalidPathError(f"cannot create parent dir: {e}") from None
 
         path.touch(exist_ok=False)
 

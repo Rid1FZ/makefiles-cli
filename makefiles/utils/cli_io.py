@@ -41,7 +41,7 @@ def print(text: str) -> None:
     Side Effects:
         Flushes the stdout buffer immediately after writing.
     """
-    stream: io.StringIO = sys.stdout  # type:ignore
+    stream: io.StringIO = sys.stdout  # type: ignore
     _write_to_stream(text, stream=stream)
     stream.flush()
 
@@ -60,7 +60,7 @@ def eprint(text: str) -> None:
     Side Effects:
         Flushes the stderr buffer immediately after writing.
     """
-    stream: io.StringIO = sys.stderr  # type:ignore
+    stream: io.StringIO = sys.stderr  # type: ignore
     _write_to_stream(text, stream=stream)
     stream.flush()
 
@@ -69,6 +69,9 @@ def input() -> str:
     """
     Reads a line of input from standard input (stdin) and returns it as a string.
 
+    NOTE: this function does not use the builtin `input` function. Instead it reads
+    directly from `stdin`.
+
     Returns:
         str: The input string with the trailing newline character removed.
 
@@ -76,6 +79,6 @@ def input() -> str:
         This function reads directly from `sys.stdin` to avoid inconsistencies
         sometimes observed with the built-in `input` function.
     """
-    stream: io.StringIO = sys.stdin  # type:ignore
-    input: str = stream.readline().rstrip("\n")
-    return input
+    stream: io.StringIO = sys.stdin  # type: ignore
+    input_line: str = stream.readline().rstrip("\n")
+    return input_line

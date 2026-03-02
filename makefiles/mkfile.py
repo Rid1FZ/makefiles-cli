@@ -3,6 +3,11 @@ import os
 import pathlib
 import typing
 
+try:
+    from typing import assert_never
+except ImportError:
+    from typing_extensions import assert_never
+
 import makefiles.cli_parser as cli_parser
 import makefiles.exceptions as exceptions
 import makefiles.types as custom_types
@@ -12,7 +17,7 @@ import makefiles.utils.dirwalker as dirwalker
 import makefiles.utils.fileutils as fileutils
 import makefiles.utils.picker as picker
 
-TEMPLATES_DIR: str = os.environ.get("XDG_TEMPLATES_DIR", f"{os.environ["HOME"]}/Templates")
+TEMPLATES_DIR: str = os.environ.get("XDG_TEMPLATES_DIR", str(pathlib.Path.home().joinpath("Templates")))
 
 
 def _get_available_templates(templates_dir: pathlib.Path) -> list[str]:
@@ -56,6 +61,8 @@ def _get_template_from_prompt(
         return picker.fzf(available_templates, height=fzf_height)
     elif t_picker == "manual":
         return picker.manual(available_templates)
+
+    assert_never(t_picker)
 
 
 def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> custom_types.ExitCode:

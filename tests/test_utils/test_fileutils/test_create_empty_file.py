@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+import makefiles.exceptions as exceptions
 import tests.utils as utils
 from makefiles.types import ExitCode
 from makefiles.utils.fileutils import create_empty_files
@@ -31,7 +32,7 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
 
     def test_no_path_given_raises(self) -> None:
         """Should raise ValueError when no path is given."""
-        with pytest.raises(ValueError, match="at least on path expected"):
+        with pytest.raises(ValueError, match="at least one path expected"):
             create_empty_files()
 
     def test_file_already_exists(self) -> None:
@@ -92,7 +93,7 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         result: ExitCode = create_empty_files((dest,), parents=False)
         assert result == ExitCode(1)
 
-        with pytest.raises(OSError):
+        with pytest.raises(exceptions.InvalidPathError):
             create_empty_files((dest,), parents=True)
 
     def test_partial_success_multiple_paths(self) -> None:

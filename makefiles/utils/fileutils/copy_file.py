@@ -57,7 +57,10 @@ def copy(
             continue
 
         fileutils.remove_path(dest)
-        dest_parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dest_parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            raise exceptions.InvalidPathError(f"cannot create parent dir: {e}") from None
 
         shutil.copyfile(src, dest, follow_symlinks=True)
 
