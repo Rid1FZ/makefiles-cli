@@ -79,7 +79,7 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
         return exitcode
 
     if cli_arguments.list:
-        cli_io.print(f"{"\n".join(_get_available_templates(templates_dir))}\n")
+        cli_io.print("\n".join(_get_available_templates(templates_dir)) + "\n")
         return exitcode
 
     files_paths: tuple[pathlib.Path, ...] = tuple(map(pathlib.Path, files))

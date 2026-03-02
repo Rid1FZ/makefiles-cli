@@ -103,7 +103,7 @@ def generate_tree(
             file_path: pathlib.Path = current_path.joinpath(file_name)
 
             create_file(file_path, empty=False)
-            all_files.append(str(file_path.relative_to(root_dir, walk_up=False)))
+            all_files.append(str(file_path.relative_to(root_dir)))
 
         # Create subdirectories
         for _ in range(random.randint(1, max_children)):
