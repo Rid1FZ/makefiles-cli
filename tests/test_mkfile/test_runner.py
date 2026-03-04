@@ -21,6 +21,8 @@ def _make_namespace(**kwargs) -> Namespace:
         parents=False,
         picker=["manual"],
         height=[NaturalNumber(10)],
+        verbose=False,
+        dry_run=False,
     )
     defaults.update(kwargs)
     return Namespace(**defaults)
@@ -90,7 +92,7 @@ class TestRunner(test_utils.MakefilesTestBase):
 
     def test_creates_parent_dirs_when_parents_flag_set(self) -> None:
         """With --parents, runner should create missing parent directories."""
-        dest: Path = self.tempdir.joinpath("subdir").joinpath("nested.txt")
+        dest: Path = self.tempdir.joinpath("subdir", "nested.txt")
         namespace: Namespace = _make_namespace(files=[str(dest)], parents=True)
         result: ExitCode = mkfile.runner(namespace, self.tempdir)
 
@@ -137,3 +139,51 @@ class TestRunner(test_utils.MakefilesTestBase):
 
         assert result == ExitCode(0)
         assert dest.read_bytes() == templates_content
+
+    def test_verbose_passed_through_to_create_empty_files(self) -> None:
+        """runner() with verbose=True should print a confirmation for each created file."""
+        dest: Path = self.tempdir.joinpath("verbose_file.txt")
+        namespace: Namespace = _make_namespace(files=[str(dest)], verbose=True)
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = mkfile.runner(namespace, self.tempdir)
+
+        assert result == ExitCode(0)
+        assert dest.is_file()
+        mock_print.assert_called()
+
+    def test_dry_run_does_not_create_file(self) -> None:
+        """runner() with dry_run=True must not create any file."""
+        dest: Path = self.tempdir.joinpath("dry_run_file.txt")
+        namespace: Namespace = _make_namespace(files=[str(dest)], dry_run=True, verbose=True)
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = mkfile.runner(namespace, self.tempdir)
+
+        assert result == ExitCode(0)
+        assert not dest.exists()
+        mock_print.assert_called()
+        printed: str = mock_print.call_args_list[0][0][0]
+        assert "[dry-run]" in printed
+
+    def test_dry_run_with_template_does_not_copy(self) -> None:
+        """runner() with dry_run=True and a template must not copy any file."""
+        templates_dir: Path
+        templates_dir, _ = self._get_templates_dir()
+
+        dest: Path = self.tempdir.joinpath("dry_run_output.py")
+        namespace: Namespace = _make_namespace(
+            files=[str(dest)],
+            template="hello.py",
+            dry_run=True,
+            verbose=True,
+        )
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = mkfile.runner(namespace, templates_dir)
+
+        assert result == ExitCode(0)
+        assert not dest.exists()
+        mock_print.assert_called()
+        printed: str = mock_print.call_args_list[0][0][0]
+        assert "[dry-run]" in printed

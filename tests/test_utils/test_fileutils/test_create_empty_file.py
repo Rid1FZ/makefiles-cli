@@ -1,9 +1,11 @@
 import random
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
 import makefiles.exceptions as exceptions
+import makefiles.utils.cli_io as cli_io
 import tests.utils as utils
 from makefiles.types import ExitCode
 from makefiles.utils.fileutils import create_empty_files
@@ -47,7 +49,7 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
 
     def test_parent_does_not_exist(self) -> None:
         """Fails if parent directory doesn't exist and parents=False; succeeds with parents=True."""
-        nested_path: Path = self.tempdir.joinpath(utils.get_random_name()).joinpath(utils.get_random_name())
+        nested_path: Path = self.tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         assert create_empty_files((nested_path,), parents=False) == ExitCode(1)
         assert not nested_path.exists()
@@ -111,9 +113,56 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
     def test_nested_and_flat_paths_mix(self) -> None:
         """Test creation of both nested and flat paths."""
         flat: Path = self.tempdir.joinpath(utils.get_random_name())
-        nested: Path = self.tempdir.joinpath(utils.get_random_name()).joinpath(utils.get_random_name())
+        nested: Path = self.tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         result: ExitCode = create_empty_files((flat, nested), parents=True)
         assert result == ExitCode(0)
         assert _is_file(flat)
         assert _is_file(nested)
+
+    def test_verbose_prints_confirmation_on_create(self) -> None:
+        """verbose=True should print a confirmation message after a successful creation."""
+        path: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = create_empty_files((path,), verbose=True)
+
+        assert result == ExitCode(0)
+        assert _is_file(path)
+        mock_print.assert_called_once()
+        printed: str = mock_print.call_args[0][0]
+        assert str(path) in printed
+
+    def test_dry_run_does_not_create_file(self) -> None:
+        """dry_run=True must not modify the filesystem."""
+        path: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = create_empty_files((path,), dry_run=True)
+
+        assert result == ExitCode(0)
+        assert not path.exists()
+        mock_print.assert_called_once()
+        printed: str = mock_print.call_args[0][0]
+        assert "[dry-run]" in printed
+        assert str(path) in printed
+
+    def test_dry_run_still_reports_existing_path(self) -> None:
+        """dry_run should still warn when a path already exists and overwrite=False."""
+        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        utils.create_file(path)
+
+        with mock.patch.object(cli_io, "eprint") as mock_eprint:
+            result: ExitCode = create_empty_files((path,), dry_run=True, overwrite=False)
+
+        assert result == ExitCode(1)
+        mock_eprint.assert_called()
+
+    def test_verbose_false_does_not_print(self) -> None:
+        """verbose=False (default) must not print any confirmation."""
+        path: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            create_empty_files((path,), verbose=False)
+
+        mock_print.assert_not_called()

@@ -1,9 +1,11 @@
 import random
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
 import makefiles.exceptions as exceptions
+import makefiles.utils.cli_io as cli_io
 import tests.utils as utils
 from makefiles.types import ExitCode
 from makefiles.utils.fileutils import copy_file
@@ -105,7 +107,7 @@ class TestCopy(utils.MakefilesTestBase):
 
     def test_copy_to_nested_path_without_parents(self, filepath: Path) -> None:
         """Fails when parent dir doesn't exist and parents=False, succeeds with parents=True."""
-        nested: Path = self.tempdir.joinpath(utils.get_random_name()).joinpath(utils.get_random_name())
+        nested: Path = self.tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         # Without creating parents
         result: ExitCode = copy_file(filepath, (nested,), parents=False)
@@ -163,3 +165,52 @@ class TestCopy(utils.MakefilesTestBase):
 
         with pytest.raises(exceptions.InvalidPathError):
             copy_file(filepath, (dest,), parents=True)
+
+    def test_verbose_prints_confirmation_on_copy(self, filepath: Path) -> None:
+        """verbose=True should print a confirmation message after a successful copy."""
+        dest: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = copy_file(filepath, (dest,), verbose=True)
+
+        assert result == ExitCode(0)
+        assert dest.is_file()
+        mock_print.assert_called_once()
+
+        printed: str = mock_print.call_args[0][0]
+        assert str(dest) in printed
+
+    def test_dry_run_does_not_create_file(self, filepath: Path) -> None:
+        """dry_run=True must not modify the filesystem."""
+        dest: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            result: ExitCode = copy_file(filepath, (dest,), dry_run=True)
+
+        assert result == ExitCode(0)
+        assert not dest.exists()
+        mock_print.assert_called_once()
+
+        printed: str = mock_print.call_args[0][0]
+        assert "[dry-run]" in printed
+        assert str(dest) in printed
+
+    def test_dry_run_reports_existing_dest(self, filepath: Path) -> None:
+        """dry_run should still warn when destination already exists and overwrite=False."""
+        dest: Path = self.tempdir.joinpath(utils.get_random_name())
+        utils.create_file(dest)
+
+        with mock.patch.object(cli_io, "eprint") as mock_eprint:
+            result: ExitCode = copy_file(filepath, (dest,), dry_run=True, overwrite=False)
+
+        assert result == ExitCode(1)
+        mock_eprint.assert_called()
+
+    def test_verbose_false_does_not_print_on_copy(self, filepath: Path) -> None:
+        """verbose=False (default) must not print any confirmation."""
+        dest: Path = self.tempdir.joinpath(utils.get_random_name())
+
+        with mock.patch.object(cli_io, "print") as mock_print:
+            copy_file(filepath, (dest,), verbose=False)
+
+        mock_print.assert_not_called()

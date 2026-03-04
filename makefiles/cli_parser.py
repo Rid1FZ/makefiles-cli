@@ -68,6 +68,23 @@ def get_parser() -> argparse.ArgumentParser:
         help="list available templates and exit",
     )
 
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="print a message for each file operation that is performed",
+    )
+
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        default=False,
+        dest="dry_run",
+        help=("show what would be done without modifying the filesystem. " "Implies --verbose."),
+    )
+
     return parser
 
 
@@ -76,5 +93,8 @@ def get_cli_args(argparser: argparse.ArgumentParser) -> argparse.Namespace:
 
     if not cli_arguments.files and not (cli_arguments.version or cli_arguments.list):
         argparser.error("the following arguments are required: files")
+
+    if cli_arguments.dry_run:
+        cli_arguments.verbose = True
 
     return cli_arguments

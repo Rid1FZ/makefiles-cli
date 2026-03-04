@@ -48,7 +48,7 @@ class TestGetHinder(test_utils.MakefilesTestBase):
 
     def test_returns_none_for_nonexistent_path_with_valid_parents(self) -> None:
         """get_hinder() should return None if all existing ancestors are valid dirs."""
-        nonexistent: Path = self.tempdir.joinpath(test_utils.get_random_name()).joinpath(test_utils.get_random_name())
+        nonexistent: Path = self.tempdir.joinpath(test_utils.get_random_name(), test_utils.get_random_name())
 
         result = utils.get_hinder(nonexistent)
         assert result is None

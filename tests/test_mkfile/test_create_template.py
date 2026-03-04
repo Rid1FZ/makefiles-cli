@@ -27,7 +27,15 @@ class TestCreateTemplate(test_utils.MakefilesTestBase):
         templates_dir, templates_content = self._setup_templates_dir()
         dest: Path = self.tempdir.joinpath("output.py")
 
-        result: ExitCode = mkfile._create_template("script.py", (dest,), templates_dir, overwrite=False, parents=False)
+        result: ExitCode = mkfile._create_template(
+            "script.py",
+            (dest,),
+            templates_dir,
+            overwrite=False,
+            parents=False,
+            verbose=False,
+            dry_run=False,
+        )
 
         assert result == ExitCode(0)
         assert dest.is_file()
@@ -41,7 +49,15 @@ class TestCreateTemplate(test_utils.MakefilesTestBase):
         dest: Path = self.tempdir.joinpath("output.py")
 
         with pytest.raises(exceptions.TemplateNotFoundError):
-            mkfile._create_template("nonexistent.py", (dest,), templates_dir, overwrite=False, parents=False)
+            mkfile._create_template(
+                "nonexistent.py",
+                (dest,),
+                templates_dir,
+                overwrite=False,
+                parents=False,
+                verbose=False,
+                dry_run=False,
+            )
 
     def test_returns_exit_code_1_when_dest_exists_no_overwrite(self) -> None:
         """Should return ExitCode(1) when destination exists and overwrite=False."""
@@ -51,7 +67,15 @@ class TestCreateTemplate(test_utils.MakefilesTestBase):
         dest: Path = self.tempdir.joinpath("output.py")
         test_utils.create_file(dest)
 
-        result: ExitCode = mkfile._create_template("script.py", (dest,), templates_dir, overwrite=False, parents=False)
+        result: ExitCode = mkfile._create_template(
+            "script.py",
+            (dest,),
+            templates_dir,
+            overwrite=False,
+            parents=False,
+            verbose=False,
+            dry_run=False,
+        )
         assert result == ExitCode(1)
 
     def test_overwrites_destination_when_overwrite_true(self) -> None:
@@ -63,6 +87,14 @@ class TestCreateTemplate(test_utils.MakefilesTestBase):
         dest: Path = self.tempdir.joinpath("output.py")
         test_utils.create_file(dest, empty=False)
 
-        result: ExitCode = mkfile._create_template("script.py", (dest,), templates_dir, overwrite=True, parents=False)
+        result: ExitCode = mkfile._create_template(
+            "script.py",
+            (dest,),
+            templates_dir,
+            overwrite=True,
+            parents=False,
+            verbose=False,
+            dry_run=False,
+        )
         assert result == ExitCode(0)
         assert dest.read_bytes() == templates_content
