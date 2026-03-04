@@ -8,51 +8,51 @@ import makefiles.utils.dirwalker as dirwalker
 import tests.utils as utils
 
 
-class TestDirWalker(utils.MakefilesTestBase):
+class TestDirWalker:
     @pytest.fixture
-    def filetree(self) -> list[str]:
+    def filetree(self, tempdir: Path) -> list[str]:
         """Generates a random file tree and returns relative paths of files created."""
         return utils.generate_tree(
-            self.tempdir,
+            tempdir,
             max_depth=random.randint(1, 5),
             max_children=random.randint(1, 5),
             max_files=random.randint(1, 5),
             hidden=False,
         )
 
-    def test_filetree_returns_all_files(self, filetree: list[str]) -> None:
+    def test_filetree_returns_all_files(self, tempdir: Path, filetree: list[str]) -> None:
         """Should return all non-hidden files in the file tree."""
-        assert set(dirwalker.listf(self.tempdir)) == set(filetree)
+        assert set(dirwalker.listf(tempdir)) == set(filetree)
 
-    def test_invalid_path_raises(self) -> None:
+    def test_invalid_path_raises(self, tempdir: Path) -> None:
         """Should raise InvalidPathError if input is not a dir or symlink to dir."""
-        invalid_path: Path = self.tempdir.joinpath(utils.get_random_name())
+        invalid_path: Path = tempdir.joinpath(utils.get_random_name())
 
         with pytest.raises(exceptions.InvalidPathError):
             dirwalker.listf(invalid_path)
 
-    def test_hidden_files_are_ignored(self) -> None:
+    def test_hidden_files_are_ignored(self, tempdir: Path) -> None:
         """Hidden files should not appear in the output."""
-        hidden_file: Path = self.tempdir.joinpath(f".{utils.get_random_name()}")
+        hidden_file: Path = tempdir.joinpath(f".{utils.get_random_name()}")
 
         utils.create_file(hidden_file)
 
-        assert dirwalker.listf(self.tempdir) == []
+        assert dirwalker.listf(tempdir) == []
 
-    def test_hidden_dirs_are_ignored(self) -> None:
+    def test_hidden_dirs_are_ignored(self, tempdir: Path) -> None:
         """Hidden directories and their contents should be skipped."""
-        hidden_dir: Path = self.tempdir.joinpath(f".{utils.get_random_name()}")
+        hidden_dir: Path = tempdir.joinpath(f".{utils.get_random_name()}")
         file_inside: Path = hidden_dir.joinpath(utils.get_random_name())
 
         hidden_dir.mkdir(parents=True)
         utils.create_file(file_inside)
 
-        assert dirwalker.listf(self.tempdir) == []
+        assert dirwalker.listf(tempdir) == []
 
-    def test_symlink_to_dir(self) -> None:
+    def test_symlink_to_dir(self, tempdir: Path) -> None:
         """Should list files under a symlinked directory."""
-        real_dir: Path = self.tempdir.joinpath(utils.get_random_name())
-        link_dir: Path = self.tempdir.joinpath(utils.get_random_name())
+        real_dir: Path = tempdir.joinpath(utils.get_random_name())
+        link_dir: Path = tempdir.joinpath(utils.get_random_name())
         file_inside = real_dir.joinpath("f.txt")
 
         real_dir.mkdir()
@@ -61,23 +61,23 @@ class TestDirWalker(utils.MakefilesTestBase):
 
         assert dirwalker.listf(link_dir) == ["f.txt"]
 
-    def test_symlink_inside_tree_included(self) -> None:
+    def test_symlink_inside_tree_included(self, tempdir: Path) -> None:
         """If a file symlink exists in tree, it should be included as a file."""
-        target: Path = self.tempdir.joinpath("original.txt")
-        link: Path = self.tempdir.joinpath("linked.txt")
+        target: Path = tempdir.joinpath("original.txt")
+        link: Path = tempdir.joinpath("linked.txt")
 
         utils.create_file(target)
         link.symlink_to(target)
 
-        assert sorted(dirwalker.listf(self.tempdir)) == ["linked.txt", "original.txt"]
+        assert sorted(dirwalker.listf(tempdir)) == ["linked.txt", "original.txt"]
 
-    def test_empty_directory_returns_empty_list(self) -> None:
+    def test_empty_directory_returns_empty_list(self, tempdir: Path) -> None:
         """Empty directories should return an empty list."""
-        assert dirwalker.listf(self.tempdir) == []
+        assert dirwalker.listf(tempdir) == []
 
-    def test_dot_files_not_in_subdirs(self) -> None:
+    def test_dot_files_not_in_subdirs(self, tempdir: Path) -> None:
         """Hidden files in subdirectories should be ignored."""
-        subdir: Path = self.tempdir.joinpath("sub")
+        subdir: Path = tempdir.joinpath("sub")
         subdir.mkdir()
 
         visible_file: Path = subdir.joinpath("x.txt")
@@ -86,4 +86,4 @@ class TestDirWalker(utils.MakefilesTestBase):
         utils.create_file(visible_file)
         utils.create_file(hidden_file)
 
-        assert dirwalker.listf(self.tempdir) == ["sub/x.txt"]
+        assert dirwalker.listf(tempdir) == ["sub/x.txt"]

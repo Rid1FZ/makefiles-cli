@@ -4,10 +4,7 @@ import pathlib
 import random
 import string
 
-from tests.utils.setup_test import MakefilesTestBase
-
 __all__: list[str] = [
-    "MakefilesTestBase",
     "compare_files",
     "create_file",
     "generate_tree",

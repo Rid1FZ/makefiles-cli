@@ -8,7 +8,7 @@ import tests.utils as test_utils
 from makefiles.types import ExitCode
 
 
-class TestMain(test_utils.MakefilesTestBase):
+class TestMain:
     """Integration-level tests for main() entry point."""
 
     def test_main_returns_exit_code_int(self) -> None:
@@ -45,11 +45,11 @@ class TestMain(test_utils.MakefilesTestBase):
 
         assert result == ExitCode(1)
 
-    def test_main_creates_file_end_to_end(self) -> None:
+    def test_main_creates_file_end_to_end(self, tempdir: Path) -> None:
         """End-to-end: main() with a real file path should create that file."""
-        dest: Path = self.tempdir.joinpath("e2e_output.txt")
+        dest: Path = tempdir.joinpath("e2e_output.txt")
 
-        templates_dir: Path = self.tempdir.joinpath("templates")
+        templates_dir: Path = tempdir.joinpath("templates")
         templates_dir.mkdir()
 
         with (

@@ -50,3 +50,45 @@ def _reset_app_logger() -> None:
     for handler in list(app_logger.handlers):
         handler.close()
         app_logger.removeHandler(handler)
+
+
+@pytest.fixture()
+def tempdir(tmp_path: pathlib.Path) -> pathlib.Path:
+    """
+    Provides a fresh empty directory for each test.
+
+    Delegates to pytest's built-in ``tmp_path`` fixture, which guarantees a
+    unique directory per test and removes it automatically afterwards.
+
+    Args:
+        tmp_path: Built-in pytest fixture providing a per-test temporary
+            directory.
+
+    Returns:
+        pathlib.Path: Path to the empty temporary directory.
+    """
+    return tmp_path
+
+
+@pytest.fixture()
+def templates_dir(tempdir: pathlib.Path) -> pathlib.Path:
+    """
+    Provides a templates directory pre-populated with one sample template.
+
+    Created as a subdirectory of the `tempdir` fixture so it is removed
+    automatically at the end of the test.  Individual tests can create
+    additional templates inside the returned directory.
+
+    Args:
+        tempdir: The per-test temporary directory fixture.
+
+    Returns:
+        pathlib.Path: Path to the populated templates directory.
+    """
+    import tests.utils as test_utils
+
+    t_dir: pathlib.Path = tempdir.joinpath("templates")
+    t_dir.mkdir()
+    test_utils.create_file(t_dir.joinpath("script.py"))
+
+    return t_dir

@@ -15,31 +15,29 @@ def _is_file(path: Path) -> bool:
     return path.is_file() and not path.is_symlink()
 
 
-class TestCreateEmptyFile(utils.MakefilesTestBase):
-    def test_create_one_file(self) -> None:
+class TestCreateEmptyFile:
+    def test_create_one_file(self, tempdir: Path) -> None:
         """Create a single empty file."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
 
         assert create_empty_files((path,)) == ExitCode(0)
         assert _is_file(path)
 
-    def test_create_multiple_files(self) -> None:
+    def test_create_multiple_files(self, tempdir: Path) -> None:
         """Create multiple empty files at once."""
-        paths: tuple[Path, ...] = tuple(
-            self.tempdir.joinpath(utils.get_random_name()) for _ in range(random.randint(3, 8))
-        )
+        paths: tuple[Path, ...] = tuple(tempdir.joinpath(utils.get_random_name()) for _ in range(random.randint(3, 8)))
 
         assert create_empty_files(paths) == ExitCode(0)
         assert all(_is_file(p) for p in paths)
 
-    def test_no_path_given_raises(self) -> None:
+    def test_no_path_given_raises(self, tempdir: Path) -> None:
         """Should raise ValueError when no path is given."""
         with pytest.raises(ValueError, match="at least one path expected"):
             create_empty_files()
 
-    def test_file_already_exists(self) -> None:
+    def test_file_already_exists(self, tempdir: Path) -> None:
         """Should fail when file exists and overwrite=False; succeed with overwrite=True."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
 
         utils.create_file(path)
 
@@ -47,9 +45,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert create_empty_files((path,), overwrite=True) == ExitCode(0)
         assert _is_file(path)
 
-    def test_parent_does_not_exist(self) -> None:
+    def test_parent_does_not_exist(self, tempdir: Path) -> None:
         """Fails if parent directory doesn't exist and parents=False; succeeds with parents=True."""
-        nested_path: Path = self.tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
+        nested_path: Path = tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         assert create_empty_files((nested_path,), parents=False) == ExitCode(1)
         assert not nested_path.exists()
@@ -57,9 +55,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert create_empty_files((nested_path,), parents=True) == ExitCode(0)
         assert _is_file(nested_path)
 
-    def test_existing_directory_path(self) -> None:
+    def test_existing_directory_path(self, tempdir: Path) -> None:
         """Overwrites a directory if overwrite=True."""
-        dir_path: Path = self.tempdir.joinpath(utils.get_random_name())
+        dir_path: Path = tempdir.joinpath(utils.get_random_name())
 
         dir_path.mkdir()
 
@@ -71,10 +69,10 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert create_empty_files((dir_path,), overwrite=True) == ExitCode(0)
         assert _is_file(dir_path)
 
-    def test_existing_symlink_path(self) -> None:
+    def test_existing_symlink_path(self, tempdir: Path) -> None:
         """Overwrites a symlink if overwrite=True."""
-        target_file: Path = self.tempdir.joinpath(utils.get_random_name())
-        symlink: Path = self.tempdir.joinpath(utils.get_random_name())
+        target_file: Path = tempdir.joinpath(utils.get_random_name())
+        symlink: Path = tempdir.joinpath(utils.get_random_name())
 
         utils.create_file(target_file)
         symlink.symlink_to(target_file)
@@ -85,9 +83,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert create_empty_files((symlink,), overwrite=True) == ExitCode(0)
         assert _is_file(symlink)
 
-    def test_dest_parent_is_file(self) -> None:
+    def test_dest_parent_is_file(self, tempdir: Path) -> None:
         """Fails when parent of target path is a file, not a directory."""
-        parent: Path = self.tempdir.joinpath(utils.get_random_name())
+        parent: Path = tempdir.joinpath(utils.get_random_name())
         dest: Path = parent.joinpath("child.txt")
 
         utils.create_file(parent, empty=True)
@@ -98,10 +96,10 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         with pytest.raises(exceptions.InvalidPathError):
             create_empty_files((dest,), parents=True)
 
-    def test_partial_success_multiple_paths(self) -> None:
+    def test_partial_success_multiple_paths(self, tempdir: Path) -> None:
         """If some paths exist and overwrite=False, should succeed on others and return ExitCode 1."""
-        existing: Path = self.tempdir.joinpath(utils.get_random_name())
-        new: Path = self.tempdir.joinpath(utils.get_random_name())
+        existing: Path = tempdir.joinpath(utils.get_random_name())
+        new: Path = tempdir.joinpath(utils.get_random_name())
 
         utils.create_file(existing)
 
@@ -110,19 +108,19 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert _is_file(new)
         assert existing.exists()
 
-    def test_nested_and_flat_paths_mix(self) -> None:
+    def test_nested_and_flat_paths_mix(self, tempdir: Path) -> None:
         """Test creation of both nested and flat paths."""
-        flat: Path = self.tempdir.joinpath(utils.get_random_name())
-        nested: Path = self.tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
+        flat: Path = tempdir.joinpath(utils.get_random_name())
+        nested: Path = tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         result: ExitCode = create_empty_files((flat, nested), parents=True)
         assert result == ExitCode(0)
         assert _is_file(flat)
         assert _is_file(nested)
 
-    def test_verbose_prints_confirmation_on_create(self) -> None:
+    def test_verbose_prints_confirmation_on_create(self, tempdir: Path) -> None:
         """verbose=True should print a confirmation message after a successful creation."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
 
         with mock.patch.object(cli_io, "print") as mock_print:
             result: ExitCode = create_empty_files((path,), verbose=True)
@@ -133,9 +131,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         printed: str = mock_print.call_args[0][0]
         assert str(path) in printed
 
-    def test_dry_run_does_not_create_file(self) -> None:
+    def test_dry_run_does_not_create_file(self, tempdir: Path) -> None:
         """dry_run=True must not modify the filesystem."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
 
         with mock.patch.object(cli_io, "print") as mock_print:
             result: ExitCode = create_empty_files((path,), dry_run=True)
@@ -147,9 +145,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert "[dry-run]" in printed
         assert str(path) in printed
 
-    def test_dry_run_still_reports_existing_path(self) -> None:
+    def test_dry_run_still_reports_existing_path(self, tempdir: Path) -> None:
         """dry_run should still warn when a path already exists and overwrite=False."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
         utils.create_file(path)
 
         with mock.patch.object(cli_io, "eprint") as mock_eprint:
@@ -158,9 +156,9 @@ class TestCreateEmptyFile(utils.MakefilesTestBase):
         assert result == ExitCode(1)
         mock_eprint.assert_called()
 
-    def test_verbose_false_does_not_print(self) -> None:
+    def test_verbose_false_does_not_print(self, tempdir: Path) -> None:
         """verbose=False (default) must not print any confirmation."""
-        path: Path = self.tempdir.joinpath(utils.get_random_name())
+        path: Path = tempdir.joinpath(utils.get_random_name())
 
         with mock.patch.object(cli_io, "print") as mock_print:
             create_empty_files((path,), verbose=False)

@@ -9,9 +9,9 @@ import tests.utils as test_utils
 from makefiles.types import NaturalNumber
 
 
-class TestGetTemplateFromPrompt(test_utils.MakefilesTestBase):
-    def _setup_templates_dir(self) -> Path:
-        templates_dir: Path = self.tempdir.joinpath("templates")
+class TestGetTemplateFromPrompt:
+    def _setup_templates_dir(self, tempdir: Path) -> Path:
+        templates_dir: Path = tempdir.joinpath("templates")
         templates_dir.mkdir()
 
         test_utils.create_file(templates_dir.joinpath("a.py"))
@@ -19,9 +19,9 @@ class TestGetTemplateFromPrompt(test_utils.MakefilesTestBase):
 
         return templates_dir
 
-    def test_uses_manual_picker(self) -> None:
+    def test_uses_manual_picker(self, tempdir: Path) -> None:
         """Should delegate to picker.manual() when picker='manual'."""
-        templates_dir: Path = self._setup_templates_dir()
+        templates_dir: Path = self._setup_templates_dir(tempdir)
 
         with mock.patch("makefiles.utils.picker.manual", return_value="a.py") as mock_manual:
             result = mkfile._get_template_from_prompt(
@@ -32,9 +32,9 @@ class TestGetTemplateFromPrompt(test_utils.MakefilesTestBase):
         mock_manual.assert_called_once()
         assert result == "a.py"
 
-    def test_uses_fzf_picker(self) -> None:
+    def test_uses_fzf_picker(self, tempdir: Path) -> None:
         """Should delegate to picker.fzf() when picker='fzf'."""
-        templates_dir: Path = self._setup_templates_dir()
+        templates_dir: Path = self._setup_templates_dir(tempdir)
 
         with mock.patch("makefiles.utils.picker.fzf", return_value="b.sh") as mock_fzf:
             result = mkfile._get_template_from_prompt(
@@ -46,10 +46,10 @@ class TestGetTemplateFromPrompt(test_utils.MakefilesTestBase):
         mock_fzf.assert_called_once()
         assert result == "b.sh"
 
-    def test_raises_when_no_templates_available(self) -> None:
+    def test_raises_when_no_templates_available(self, tempdir: Path) -> None:
         """Should raise NoTemplatesAvailableError when template dir is empty."""
         with pytest.raises(exceptions.NoTemplatesAvailableError):
             mkfile._get_template_from_prompt(
                 t_picker="manual",
-                templates_dir=self.tempdir,
+                templates_dir=tempdir,
             )
