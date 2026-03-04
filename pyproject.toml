@@ -30,19 +30,12 @@ requires = ["setuptools>=42", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-build = [
-    "setuptools>=80.9.0",
-    "setuptools-scm>=8.3.1",
-]
-editor = [
+dev = [
     "black>=25.1.0",
     "isort>=6.0.1",
+    "mypy>=1.19.1",
     "pyright>=1.1.401",
-]
-testing = [
     "pytest>=8.3.5",
-    "setuptools>=80.9.0",
-    "setuptools-scm>=8.3.1",
 ]
 
 [tool.black]
@@ -51,11 +44,12 @@ line-length = 120
 [tool.isort]
 line_length = 120
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["makefiles*"]
+
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
 version_file = "makefiles/_version.py"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["makefiles*"]
