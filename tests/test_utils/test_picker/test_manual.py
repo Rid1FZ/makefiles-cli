@@ -7,7 +7,7 @@ from makefiles.utils.picker import manual
 
 
 class TestSimplePrompt:
-    def test_returns_correct_selection(self):
+    def test_returns_correct_selection(self) -> None:
         """Should return the correct option based on valid user input."""
         options: list[str] = ["delta", "alpha", "charlie"]
         user_input: str = "2"  # sorted: ["alpha", "charlie", "delta"] => index 2 = "charlie"
@@ -26,7 +26,7 @@ class TestSimplePrompt:
             assert "[3]: delta" in printed_lines[2]
 
     @pytest.mark.parametrize("bad_input", ["abc", "0", "-1", "99", "", "3.14"])
-    def test_invalid_inputs_retry_until_valid(self, bad_input: str):
+    def test_invalid_inputs_retry_until_valid(self, bad_input: str) -> None:
         """Should loop on invalid inputs until a valid selection is made."""
         options: list[str] = ["one", "two", "three"]
         valid_input: str = "1"
@@ -41,7 +41,7 @@ class TestSimplePrompt:
             error_calls = [call.args[0] for call in mock_eprint.call_args_list]
             assert "Please insert a valid input\n" in error_calls
 
-    def test_exact_bounds_selection(self):
+    def test_exact_bounds_selection(self) -> None:
         """Should accept lowest and highest valid index values."""
         options: list[str] = ["x", "a", "z"]  # sorted: ["a", "x", "z"]
 

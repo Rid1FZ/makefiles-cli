@@ -107,15 +107,16 @@ class TestCopy:
 
     def test_copy_to_nested_path_without_parents(self, tempdir: Path, filepath: Path) -> None:
         """Fails when parent dir doesn't exist and parents=False, succeeds with parents=True."""
+        result: ExitCode
         nested: Path = tempdir.joinpath(utils.get_random_name(), utils.get_random_name())
 
         # Without creating parents
-        result: ExitCode = copy_file(filepath, (nested,), parents=False)
+        result = copy_file(filepath, (nested,), parents=False)
         assert result == ExitCode(1)
         assert not nested.exists()
 
         # With parent creation
-        result: ExitCode = copy_file(filepath, (nested,), parents=True)
+        result = copy_file(filepath, (nested,), parents=True)
         assert result == ExitCode(0)
         assert utils.compare_files(filepath, nested)
 

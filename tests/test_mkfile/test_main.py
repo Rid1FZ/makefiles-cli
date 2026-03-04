@@ -4,7 +4,6 @@ from unittest import mock
 import makefiles.exceptions as exceptions
 import makefiles.mkfile as mkfile
 import makefiles.utils.cli_io as cli_io
-import tests.utils as test_utils
 from makefiles.types import ExitCode
 
 

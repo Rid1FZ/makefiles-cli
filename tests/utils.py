@@ -94,6 +94,7 @@ def generate_tree(
 
         if depth > max_depth:
             return
+
         # Create files
         for _ in range(random.randint(1, max_files)):
             file_name: str = maybe_hide(get_random_str(random.randint(16, 32), special_chars=False))

@@ -34,7 +34,7 @@ class TestRunner:
         templates_dir.mkdir()
 
         random_content: bytes = test_utils.get_random_str(special_chars=True).encode()
-        templates_dir.joinpath("hello.py").write_bytes(random_content)
+        templates_dir.joinpath("sample_template.txt").write_bytes(random_content)
 
         return (templates_dir, random_content)
 
@@ -48,11 +48,13 @@ class TestRunner:
         assert result == ExitCode(1)
         mock_print.assert_called_once()
 
-    def test_list_prints_templates_and_returns_0(self, tempdir: Path) -> None:
+    def test_list_prints_templates_and_returns_0(
+        self, tempdir: Path, populated_templates_dir: tuple[Path, bytes]
+    ) -> None:
         """--list should print available templates and return ExitCode(0)."""
         templates_dir: Path
 
-        templates_dir, _ = self._get_templates_dir(tempdir)
+        templates_dir, _ = populated_templates_dir
         namespace: Namespace = _make_namespace(list=True)
 
         with mock.patch.object(cli_io, "print") as mock_print:
@@ -60,7 +62,7 @@ class TestRunner:
 
         assert result == ExitCode(0)
         printed: list[str] = mock_print.call_args[0][0]
-        assert "hello.py" in printed
+        assert "sample_template.txt" in printed
 
     def test_list_raises_when_no_templates(self, tempdir: Path) -> None:
         """--list should raise NoTemplatesAvailableError if template dir is empty."""
@@ -99,42 +101,54 @@ class TestRunner:
         assert result == ExitCode(0)
         assert dest.is_file()
 
-    def test_creates_file_from_named_template(self, tempdir: Path) -> None:
+    def test_creates_file_from_named_template(
+        self,
+        tempdir: Path,
+        populated_templates_dir: tuple[Path, bytes],
+    ) -> None:
         """With --template=X, runner should copy the template to destinations."""
         templates_dir: Path
         templates_content: bytes
 
-        templates_dir, templates_content = self._get_templates_dir(tempdir)
+        templates_dir, templates_content = populated_templates_dir
         dest: Path = tempdir.joinpath("output.py")
-        namespace: Namespace = _make_namespace(files=[str(dest)], template="hello.py")
+        namespace: Namespace = _make_namespace(files=[str(dest)], template="sample_template.txt")
 
         result: ExitCode = mkfile.runner(namespace, templates_dir)
 
         assert result == ExitCode(0)
         assert dest.read_bytes() == templates_content
 
-    def test_raises_on_unknown_template_name(self, tempdir: Path) -> None:
+    def test_raises_on_unknown_template_name(
+        self,
+        tempdir: Path,
+        populated_templates_dir: tuple[Path, bytes],
+    ) -> None:
         """With --template=UNKNOWN, runner should raise TemplateNotFoundError."""
         templates_dir: Path
 
-        templates_dir, _ = self._get_templates_dir(tempdir)
+        templates_dir, _ = populated_templates_dir
         dest: Path = tempdir.joinpath("output.py")
         namespace: Namespace = _make_namespace(files=[str(dest)], template="no_such_template.py")
 
         with pytest.raises(exceptions.TemplateNotFoundError):
             mkfile.runner(namespace, templates_dir)
 
-    def test_prompts_for_template_when_sentinel_given(self, tempdir: Path) -> None:
+    def test_prompts_for_template_when_sentinel_given(
+        self,
+        tempdir: Path,
+        populated_templates_dir: tuple[Path, bytes],
+    ) -> None:
         """When template is a sentinel (not str), runner should invoke picker."""
         templates_dir: Path
         templates_content: bytes
 
-        templates_dir, templates_content = self._get_templates_dir(tempdir)
+        templates_dir, templates_content = populated_templates_dir
         dest: Path = tempdir.joinpath("output.py")
         # Pass a non-string, non-None sentinel (as the CLI does for bare --template)
         namespace: Namespace = _make_namespace(files=[str(dest)], template=object())
 
-        with mock.patch("makefiles.utils.picker.manual", return_value="hello.py"):
+        with mock.patch("makefiles.utils.picker.manual", return_value="sample_template.txt"):
             result: ExitCode = mkfile.runner(namespace, templates_dir)
 
         assert result == ExitCode(0)
@@ -166,15 +180,19 @@ class TestRunner:
         printed: str = mock_print.call_args_list[0][0][0]
         assert "[dry-run]" in printed
 
-    def test_dry_run_with_template_does_not_copy(self, tempdir: Path) -> None:
+    def test_dry_run_with_template_does_not_copy(
+        self,
+        tempdir: Path,
+        populated_templates_dir: tuple[Path, tuple],
+    ) -> None:
         """runner() with dry_run=True and a template must not copy any file."""
         templates_dir: Path
-        templates_dir, _ = self._get_templates_dir(tempdir)
+        templates_dir, _ = populated_templates_dir
 
         dest: Path = tempdir.joinpath("dry_run_output.py")
         namespace: Namespace = _make_namespace(
             files=[str(dest)],
-            template="hello.py",
+            template="sample_template.txt",
             dry_run=True,
             verbose=True,
         )

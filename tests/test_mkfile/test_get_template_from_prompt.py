@@ -5,38 +5,30 @@ import pytest
 
 import makefiles.exceptions as exceptions
 import makefiles.mkfile as mkfile
-import tests.utils as test_utils
 from makefiles.types import NaturalNumber
 
 
 class TestGetTemplateFromPrompt:
-    def _setup_templates_dir(self, tempdir: Path) -> Path:
-        templates_dir: Path = tempdir.joinpath("templates")
-        templates_dir.mkdir()
-
-        test_utils.create_file(templates_dir.joinpath("a.py"))
-        test_utils.create_file(templates_dir.joinpath("b.sh"))
-
-        return templates_dir
-
-    def test_uses_manual_picker(self, tempdir: Path) -> None:
+    def test_uses_manual_picker(self, populated_templates_dir: tuple[Path, bytes]) -> None:
         """Should delegate to picker.manual() when picker='manual'."""
-        templates_dir: Path = self._setup_templates_dir(tempdir)
+        templates_dir: Path
+        templates_dir, _ = populated_templates_dir
 
-        with mock.patch("makefiles.utils.picker.manual", return_value="a.py") as mock_manual:
+        with mock.patch("makefiles.utils.picker.manual", return_value="sample_template.txt") as mock_manual:
             result = mkfile._get_template_from_prompt(
                 t_picker="manual",
                 templates_dir=templates_dir,
             )
 
         mock_manual.assert_called_once()
-        assert result == "a.py"
+        assert result == "sample_template.txt"
 
-    def test_uses_fzf_picker(self, tempdir: Path) -> None:
+    def test_uses_fzf_picker(self, populated_templates_dir: tuple[Path, bytes]) -> None:
         """Should delegate to picker.fzf() when picker='fzf'."""
-        templates_dir: Path = self._setup_templates_dir(tempdir)
+        templates_dir: Path
+        templates_dir, _ = populated_templates_dir
 
-        with mock.patch("makefiles.utils.picker.fzf", return_value="b.sh") as mock_fzf:
+        with mock.patch("makefiles.utils.picker.fzf", return_value="sample_template.txt") as mock_fzf:
             result = mkfile._get_template_from_prompt(
                 t_picker="fzf",
                 fzf_height=NaturalNumber(10),
@@ -44,7 +36,7 @@ class TestGetTemplateFromPrompt:
             )
 
         mock_fzf.assert_called_once()
-        assert result == "b.sh"
+        assert result == "sample_template.txt"
 
     def test_raises_when_no_templates_available(self, tempdir: Path) -> None:
         """Should raise NoTemplatesAvailableError when template dir is empty."""
