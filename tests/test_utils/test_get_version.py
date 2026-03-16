@@ -1,3 +1,4 @@
+from typing import Any
 from unittest import mock
 
 import makefiles.utils as utils
@@ -20,10 +21,10 @@ class TestGetVersion:
         sys.modules.pop(module_key, None)
         _pkg.__dict__.pop("_version", None)
 
-    def setup_method(self, _) -> None:
+    def setup_method(self, _: Any) -> None:
         self._scrub(self._MODULE_KEY)
 
-    def teardown_method(self, _) -> None:
+    def teardown_method(self, _: Any) -> None:
         self._scrub(self._MODULE_KEY)
 
     def test_returns_string(self) -> None:

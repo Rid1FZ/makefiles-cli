@@ -33,7 +33,7 @@ def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_ty
 
     options_str: str = "\n".join(options)
 
-    process: subprocess.CompletedProcess = subprocess.run(
+    process: subprocess.CompletedProcess[str] = subprocess.run(
         ["fzf", *FZF_DEFAULT_FLAGS, f"--height=~{int(height)}"],
         input=options_str,
         text=True,
@@ -45,4 +45,4 @@ def prompt(options: list[str], *, height: custom_types.NaturalNumber = custom_ty
             raise KeyboardInterrupt
         raise exceptions.FZFError("`fzf` command returned non zero exit code")
 
-    return process.stdout.strip("\n")
+    return str(process.stdout).strip("\n")

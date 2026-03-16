@@ -3,6 +3,7 @@ import functools
 import pathlib
 import random
 import string
+from pathlib import Path
 
 __all__: list[str] = [
     "compare_files",
@@ -13,7 +14,19 @@ __all__: list[str] = [
     "get_random_name",
 ]
 
-compare_files: functools.partial = functools.partial(filecmp.cmp, shallow=False)
+
+def compare_files(file1: Path, file2: Path) -> bool:
+    """
+    Compares two files.
+
+    Args:
+        file1 (pathlib.Path): first file.
+        file2 (pathlib.Path): second file.
+
+    Returns(bool):
+        `True` if both file are same, else `False`.
+    """
+    return functools.partial(filecmp.cmp, shallow=False)(file1, file2)
 
 
 def _ensure_natural_number(num: int, name: str) -> None:
@@ -89,7 +102,7 @@ def generate_tree(
     def maybe_hide(name: str) -> str:
         return f".{name}" if hidden and random.choice([True, False]) else name
 
-    def _create_tree(current_path: pathlib.Path, *, depth: int = 1):
+    def _create_tree(current_path: pathlib.Path, *, depth: int = 1) -> None:
         nonlocal all_files, max_children, max_files, maybe_hide
 
         if depth > max_depth:

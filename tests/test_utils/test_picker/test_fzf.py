@@ -1,4 +1,5 @@
 import subprocess
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -12,10 +13,10 @@ from makefiles.utils.picker.fzf import FZF_DEFAULT_FLAGS
 @mock.patch("shutil.which", return_value="/usr/bin/fzf")
 @mock.patch("subprocess.run")
 class TestFzf:
-    def test_returns_selected_option(self, mock_run, _):
+    def test_returns_selected_option(self, mock_run: mock.MagicMock, _: Any) -> None:
         """Should return the user's selected value."""
-        options = ["apple", "banana", "cherry"]
-        expected = "banana"
+        options: list[str] = ["apple", "banana", "cherry"]
+        expected: str = "banana"
 
         mock_run.return_value = subprocess.CompletedProcess(
             args=["fzf"],
@@ -34,7 +35,7 @@ class TestFzf:
             capture_output=True,
         )
 
-    def test_returns_stripped_output(self, mock_run, _):
+    def test_returns_stripped_output(self, mock_run: mock.MagicMock, _: Any) -> None:
         """Should strip trailing newlines from fzf output."""
         mock_run.return_value = subprocess.CompletedProcess(
             args=["fzf"],
@@ -45,9 +46,9 @@ class TestFzf:
 
         assert fzf(["grape"]) == "grape"
 
-    def test_uses_custom_height(self, mock_run, _):
+    def test_uses_custom_height(self, mock_run: mock.MagicMock, _: Any) -> None:
         """Should pass custom height to fzf."""
-        height = NaturalNumber(25)
+        height: NaturalNumber = NaturalNumber(25)
 
         mock_run.return_value = subprocess.CompletedProcess(
             args=["fzf"],
@@ -60,7 +61,7 @@ class TestFzf:
 
         assert f"--height=~{height}" in mock_run.call_args[0][0]
 
-    def test_fzf_not_found(self, *_):
+    def test_fzf_not_found(self, *_: Any) -> None:
         """Raises FZFNotFoundError when fzf is not found in PATH."""
         with (
             mock.patch("shutil.which", return_value=None),  # overwriting class default patch
@@ -68,7 +69,7 @@ class TestFzf:
         ):
             fzf(["one", "two", "three"])
 
-    def test_fzf_exit_code_non_zero(self, mock_run, _):
+    def test_fzf_exit_code_non_zero(self, mock_run: mock.MagicMock, _: Any) -> None:
         """Raises FZFError if fzf exits with non-zero code other than 130."""
         mock_run.return_value = subprocess.CompletedProcess(
             args=["fzf"],
@@ -80,7 +81,7 @@ class TestFzf:
         with pytest.raises(exceptions.FZFError):
             fzf(["one", "two", "three"])
 
-    def test_keyboard_interrupt(self, mock_run, _):
+    def test_keyboard_interrupt(self, mock_run: mock.MagicMock, _: Any) -> None:
         """Raises KeyboardInterrupt if fzf returns exit code 130."""
         mock_run.return_value = subprocess.CompletedProcess(
             args=["fzf"],

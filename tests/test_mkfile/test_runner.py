@@ -1,5 +1,6 @@
 from argparse import Namespace
 from pathlib import Path
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -11,7 +12,7 @@ import tests.utils as test_utils
 from makefiles.types import ExitCode, NaturalNumber
 
 
-def _make_namespace(**kwargs) -> Namespace:
+def _make_namespace(**kwargs: Any) -> Namespace:
     """Build an argparse.Namespace with sensible defaults for runner() tests."""
     defaults = dict(
         files=[],
@@ -183,7 +184,7 @@ class TestRunner:
     def test_dry_run_with_template_does_not_copy(
         self,
         tempdir: Path,
-        populated_templates_dir: tuple[Path, tuple],
+        populated_templates_dir: tuple[Path, bytes],
     ) -> None:
         """runner() with dry_run=True and a template must not copy any file."""
         templates_dir: Path

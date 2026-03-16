@@ -46,7 +46,7 @@ def _reset_app_logger() -> None:
     """
     from makefiles.logger import _APP_NAME
 
-    app_logger: logging.Logger = logging.getLogger(_APP_NAME)  # ← stays in sync
+    app_logger: logging.Logger = logging.getLogger(_APP_NAME)
     for handler in list(app_logger.handlers):
         handler.close()
         app_logger.removeHandler(handler)

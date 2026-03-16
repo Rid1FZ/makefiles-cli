@@ -1,4 +1,5 @@
 from argparse import Namespace
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -10,7 +11,7 @@ from makefiles.types import NaturalNumber
 class TestGetCliArgs:
     """Tests for get_cli_args() validation logic."""
 
-    def setup_method(self, _) -> None:
+    def setup_method(self, _: Any) -> None:
         self.parser = cli_parser.get_parser()
 
     def _parse(self, argv: list[str]) -> Namespace:

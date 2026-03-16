@@ -1,5 +1,6 @@
 import argparse
 from argparse import Namespace
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -11,7 +12,7 @@ from makefiles.types import NaturalNumber
 class TestGetParser:
     """Tests for the argument parser structure returned by get_parser()."""
 
-    def setup_method(self, _) -> None:
+    def setup_method(self, _: Any) -> None:
         self.parser: argparse.ArgumentParser = cli_parser.get_parser()
 
     def test_returns_argument_parser(self) -> None:

@@ -31,11 +31,14 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.19.1",
+    "pytest>=8.3.5",
+]
+
+editor = [
+    "pyright>=1.1.401",
     "black>=25.1.0",
     "isort>=6.0.1",
-    "mypy>=1.19.1",
-    "pyright>=1.1.401",
-    "pytest>=8.3.5",
 ]
 
 [tool.black]
@@ -43,6 +46,9 @@ line-length = 120
 
 [tool.isort]
 line_length = 120
+
+[tool.mypy]
+strict = true
 
 [tool.setuptools.packages.find]
 where = ["."]

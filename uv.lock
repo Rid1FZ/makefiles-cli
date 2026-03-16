@@ -181,11 +181,13 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+]
+editor = [
     { name = "black" },
     { name = "isort" },
-    { name = "mypy" },
     { name = "pyright" },
-    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -193,11 +195,13 @@ requires-dist = [{ name = "typing-extensions", specifier = ">=4.13.2" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = ">=1.19.1" },
+    { name = "pytest", specifier = ">=8.3.5" },
+]
+editor = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "isort", specifier = ">=6.0.1" },
-    { name = "mypy", specifier = ">=1.19.1" },
     { name = "pyright", specifier = ">=1.1.401" },
-    { name = "pytest", specifier = ">=8.3.5" },
 ]
 
 [[package]]
