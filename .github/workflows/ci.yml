@@ -1,5 +1,3 @@
-# .github/workflows/ci.yml
-
 name: CI
 
 on:
@@ -40,3 +38,24 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
+
+  type-check:
+    name: "Type check (mypy)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-caching: true
+          cache-dependency-glob: "pyproject.toml"
+          python-version: "3.10" # minimum supported version
+
+      - name: Install project and test dependencies
+        run: uv sync
+
+      - name: Run mypy
+        run: uv run mypy .
