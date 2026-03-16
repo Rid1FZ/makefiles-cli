@@ -52,7 +52,7 @@ jobs:
         with:
           enable-caching: true
           cache-dependency-glob: "pyproject.toml"
-          python-version: "3.10" # minimum supported version
+          python-version: "3.11" # python 3.10 does not have `assert_never` which causes mypy check to fail
 
       - name: Install project and test dependencies
         run: uv sync
