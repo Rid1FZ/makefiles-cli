@@ -53,7 +53,7 @@ class TestMain:
 
         with (
             mock.patch("sys.argv", ["mkfile", str(dest)]),
-            mock.patch("makefiles.mkfile.TEMPLATES_DIR", str(templates_dir)),
+            mock.patch("makefiles.mkfile._get_templates_dir", return_value=templates_dir),
         ):
             result: ExitCode = mkfile.main()
 

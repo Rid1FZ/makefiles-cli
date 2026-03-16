@@ -1,8 +1,8 @@
 import argparse
 import os
-import pathlib
-import typing
 from logging import Logger
+from pathlib import Path
+from platform import system
 from typing import Literal
 
 try:
@@ -20,12 +20,28 @@ import makefiles.utils.fileutils as fileutils
 import makefiles.utils.picker as picker
 from makefiles.logger import get_logger, setup_logging
 
-TEMPLATES_DIR: typing.Final[str] = os.environ.get("XDG_TEMPLATES_DIR", str(pathlib.Path.home().joinpath("Templates")))
-
 _logger: Logger = get_logger(__name__)
 
 
-def _get_available_templates(templates_dir: pathlib.Path) -> list[str]:
+def _get_templates_dir() -> Path | None:
+    """
+    Get path to the templates directory. It detects the current
+    platform and returns the templates directory accordingly.
+
+    Returns:
+        pathlib.Path | None: The template directory if possible. Else `None`.
+    """
+    templates_dir: str
+    curr_os: str = system()
+
+    if curr_os in ("Linux", "FreeBSD", "OpenBSD", "NetBSD"):
+        templates_dir = os.environ.get("XDG_TEMPLATES_DIR", str(Path.home().joinpath("Templates")))
+        return Path(templates_dir)
+
+    return None
+
+
+def _get_available_templates(templates_dir: Path) -> list[str]:
     """
     Returns relative paths of all non-hidden files under *templates_dir*.
 
@@ -51,8 +67,8 @@ def _get_available_templates(templates_dir: pathlib.Path) -> list[str]:
 
 def _create_template(
     template: str,
-    destinations: tuple[pathlib.Path, ...],
-    templates_dir: pathlib.Path,
+    destinations: tuple[Path, ...],
+    templates_dir: Path,
     overwrite: bool,
     parents: bool,
     verbose: bool,
@@ -79,7 +95,7 @@ def _create_template(
     """
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
 
-    template_path: pathlib.Path = templates_dir.joinpath(template)
+    template_path: Path = templates_dir.joinpath(template)
     _logger.debug("_create_template: template=%s destinations=%s dry_run=%s", template_path, destinations, dry_run)
 
     try:
@@ -104,7 +120,7 @@ def _get_template_from_prompt(
     *,
     t_picker: Literal["fzf"] | Literal["manual"],
     fzf_height: custom_types.NaturalNumber = custom_types.NaturalNumber(10),
-    templates_dir: pathlib.Path,
+    templates_dir: Path,
 ) -> str:
     """
     Interactively prompts the user to choose a template.
@@ -133,7 +149,7 @@ def _get_template_from_prompt(
     assert_never(t_picker)  # for linter
 
 
-def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> custom_types.ExitCode:
+def runner(cli_arguments: argparse.Namespace, templates_dir: Path) -> custom_types.ExitCode:
     """
     Core program logic: dispatches to file-creation or template-copy
     operations based on the parsed CLI arguments.
@@ -172,7 +188,7 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: pathlib.Path) -> cu
         cli_io.print("\n".join(_get_available_templates(templates_dir)) + "\n")
         return exitcode
 
-    files_paths: tuple[pathlib.Path, ...] = tuple(map(pathlib.Path, files))
+    files_paths: tuple[Path, ...] = tuple(map(Path, files))
 
     _logger.info(
         "runner: files=%s template=%r verbose=%s dry_run=%s parents=%s",
@@ -234,10 +250,15 @@ def main() -> custom_types.ExitCode:
     setup_logging()
     _logger.info("makefiles-cli started")
 
-    templates_dir_path: pathlib.Path = pathlib.Path(TEMPLATES_DIR)
     exitcode: custom_types.ExitCode = custom_types.ExitCode(0)
-
     argument_parser: argparse.ArgumentParser = cli_parser.get_parser()
+
+    templates_dir_path: Path | None = _get_templates_dir()
+    if templates_dir_path is None:
+        cli_io.eprint("f{argument_parser.prog}: could not detect templates directory")
+        _logger.error("could not detect templates directory")
+        exitcode = custom_types.ExitCode(1)
+        return exitcode
 
     try:
         cli_arguments: argparse.Namespace = cli_parser.get_cli_args(argument_parser)
