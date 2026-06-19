@@ -20,7 +20,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-caching: true
-          cache-dependency-glob: "pyproject.toml"
+          python-version: "3.x"
 
       - name: Build wheel and sdist
         run: uv build
@@ -41,7 +41,8 @@ jobs:
       url: https://pypi.org/p/makefiles-cli
 
     permissions:
-      id-token: write
+      id-token: write  # Mandatory for PyPI Trusted Publishing OIDC
+      contents: read   # Explicitly allowed for checking out/downloading artifacts safely
 
     steps:
       - name: Download distribution artifacts

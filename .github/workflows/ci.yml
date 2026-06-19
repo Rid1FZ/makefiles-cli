@@ -8,6 +8,11 @@ on:
     branches:
       - master
 
+# Prevents redundant parallel runs on the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: "Python ${{ matrix.python-version }}"
@@ -30,11 +35,10 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-caching: true
-          cache-dependency-glob: "pyproject.toml"
           python-version: ${{ matrix.python-version }}
 
       - name: Install project and test dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       - name: Run tests
         run: uv run pytest
@@ -51,11 +55,10 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-caching: true
-          cache-dependency-glob: "pyproject.toml"
-          python-version: "3.11" # python 3.10 does not have `assert_never` which causes mypy check to fail
+          python-version: "3.x" # Dynamically pulls the latest stable Python 3 release
 
       - name: Install project and test dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       - name: Run mypy
         run: uv run mypy .
