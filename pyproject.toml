@@ -38,6 +38,7 @@ editor = [
     "pyright>=1.1.401",
     "black>=25.1.0",
     "isort>=6.0.1",
+    "ruff>=0.15.20",
 ]
 
 [tool.black]
