@@ -22,7 +22,9 @@ def prompt(options: list[str]) -> str:
         try:
             cli_io.eprint("Choose a template: ")
             choice: custom_types.NaturalNumber = custom_types.NaturalNumber(cli_io.input())
-            assert choice <= len(sorted_options)
+            if choice <= len(sorted_options):
+                raise ValueError
+
             break
         except (ValueError, TypeError, AssertionError):
             cli_io.eprint("Please insert a valid input\n")
