@@ -41,6 +41,13 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="overwrite destination if it already exists",
+    )
+
+    parser.add_argument(
         "-P",
         "--picker",
         nargs=1,
@@ -82,7 +89,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         dest="dry_run",
-        help=("show what would be done without modifying the filesystem. " "Implies --verbose."),
+        help=("show what would be done without modifying the filesystem. Implies --verbose."),
     )
 
     return parser

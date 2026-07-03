@@ -20,6 +20,7 @@ def _make_namespace(**kwargs: Any) -> Namespace:
         list=False,
         template=None,
         parents=False,
+        force=False,
         picker=["manual"],
         height=[NaturalNumber(10)],
         verbose=False,
@@ -92,6 +93,39 @@ class TestRunner:
 
         result: ExitCode = mkfile.runner(namespace, tempdir)
         assert result == ExitCode(1)
+
+    def test_force_overwrites_existing_empty_file(self, tempdir: Path) -> None:
+        """With --force, an existing destination should be replaced, not skipped."""
+        dest: Path = tempdir.joinpath("existing.txt")
+        test_utils.create_file(dest)  # non-empty, random content
+
+        namespace: Namespace = _make_namespace(files=[str(dest)], force=True)
+
+        result: ExitCode = mkfile.runner(namespace, tempdir)
+
+        assert result == ExitCode(0)
+        assert dest.is_file()
+        assert dest.stat().st_size == 0
+
+    def test_force_overwrites_existing_template_destination(
+        self,
+        tempdir: Path,
+        populated_templates_dir: tuple[Path, bytes],
+    ) -> None:
+        """With --force, an existing destination should be replaced when copying a template too."""
+        templates_dir: Path
+        templates_content: bytes
+
+        templates_dir, templates_content = populated_templates_dir
+        dest: Path = tempdir.joinpath("existing_output.py")
+        test_utils.create_file(dest)  # non-empty, random content - must differ from the template
+
+        namespace: Namespace = _make_namespace(files=[str(dest)], template="sample_template.txt", force=True)
+
+        result: ExitCode = mkfile.runner(namespace, templates_dir)
+
+        assert result == ExitCode(0)
+        assert dest.read_bytes() == templates_content
 
     def test_creates_parent_dirs_when_parents_flag_set(self, tempdir: Path) -> None:
         """With --parents, runner should create missing parent directories."""

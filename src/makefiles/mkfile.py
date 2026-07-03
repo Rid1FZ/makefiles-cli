@@ -178,6 +178,7 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: Path) -> custom_typ
     fzf_height: custom_types.NaturalNumber = cli_arguments.height[0]
     verbose: bool = cli_arguments.verbose
     dry_run: bool = cli_arguments.dry_run
+    force: bool = cli_arguments.force
 
     if cli_arguments.version:
         cli_io.print(f"{utils.get_version()}\n")
@@ -191,19 +192,20 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: Path) -> custom_typ
     files_paths: tuple[Path, ...] = tuple(map(Path, files))
 
     _logger.info(
-        "runner: files=%s template=%r verbose=%s dry_run=%s parents=%s",
+        "runner: files=%s template=%r verbose=%s dry_run=%s parents=%s force=%s",
         files,
         template if isinstance(template, str) or template is None else "<sentinel>",
         verbose,
         dry_run,
         cli_arguments.parents,
+        force,
     )
 
     if not template:
         exitcode = (
             fileutils.create_empty_files(
                 files_paths,
-                overwrite=False,
+                overwrite=force,
                 parents=cli_arguments.parents,
                 verbose=verbose,
                 dry_run=dry_run,
@@ -224,7 +226,7 @@ def runner(cli_arguments: argparse.Namespace, templates_dir: Path) -> custom_typ
             template,
             files_paths,
             templates_dir=templates_dir,
-            overwrite=False,
+            overwrite=force,
             parents=cli_arguments.parents,
             verbose=verbose,
             dry_run=dry_run,

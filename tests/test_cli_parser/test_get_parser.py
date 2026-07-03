@@ -98,6 +98,26 @@ class TestGetParser:
 
         assert namespace.parents is True
 
+    # --- --force / -f flag ---
+
+    def test_force_defaults_to_false(self) -> None:
+        """--force should default to False."""
+        namespace: Namespace = self.parser.parse_args(["file.txt"])
+
+        assert namespace.force is False
+
+    def test_force_flag_sets_true(self) -> None:
+        """--force flag should set force=True."""
+        namespace: Namespace = self.parser.parse_args(["file.txt", "--force"])
+
+        assert namespace.force is True
+
+    def test_force_short_flag(self) -> None:
+        """-f flag should set force=True."""
+        namespace: Namespace = self.parser.parse_args(["file.txt", "-f"])
+
+        assert namespace.force is True
+
     # --- --picker / -P argument ---
 
     def test_picker_defaults_to_manual(self) -> None:
