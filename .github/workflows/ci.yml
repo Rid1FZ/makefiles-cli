@@ -13,18 +13,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  generate-matrix:
+    name: Generate Python version matrix
+    runs-on: ubuntu-latest
+
+    outputs:
+      python-versions: ${{ steps.versions.outputs.python-versions }}
+      latest-python-version: ${{ steps.versions.outputs.latest-python-version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.2.0
+
+      - name: Extract supported Python versions from pyproject.toml
+        id: versions
+        run: |
+          echo "python-versions=$(uv run --no-project --python 3.12 python3 scripts/test-matrix.py versions --json)" >> "$GITHUB_OUTPUT"
+          echo "latest-python-version=$(uv run --no-project --python 3.12 python3 scripts/test-matrix.py versions --latest)" >> "$GITHUB_OUTPUT"
+
   test:
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
+    needs: generate-matrix
 
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
+        python-version: ${{ fromJSON(needs.generate-matrix.outputs.python-versions) }}
 
     steps:
       - name: Checkout repository

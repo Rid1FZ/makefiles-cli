@@ -41,6 +41,10 @@ editor = [
     "ruff>=0.15.20",
 ]
 
+[tool.uv]
+python-downloads = "automatic"
+python-preference = "managed"
+
 [tool.black]
 line-length = 120
 
