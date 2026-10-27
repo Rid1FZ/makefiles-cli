@@ -25,15 +25,14 @@ mkfile = "makefiles.mkfile:main"
 Homepage = "https://github.com/Rid1FZ/makefiles-cli"
 
 [build-system]
-requires = ["setuptools>=42", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
     "pytest>=8.3.5",
 ]
-
 editor = [
     "pyright>=1.1.401",
     "black>=25.1.0",
@@ -62,12 +61,15 @@ docstring-code-format = true
 [tool.mypy]
 strict = true
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["makefiles*"]
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools_scm]
+[tool.hatch.version.raw-options]
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
-version_file = "src/makefiles/_version.py"
 
+[tool.hatch.build.hooks.vcs]
+version-file = "src/makefiles/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/makefiles"]
